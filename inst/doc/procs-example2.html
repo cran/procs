@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Example 2: Adverse Events</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Example 2: Adverse Events</h1>
+
+
+
+<div id="program" class="section level2">
+<h2>Program</h2>
+<p>The following example is an adverse events program. The program
+demonstrates how multiple frequency tables can be combined into a single
+report. This example also shows how a wide report can be wrapped
+horizontally using the <code>page_wrap</code> feature of the
+<strong>reporter</strong> package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(sassy)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(procs)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">options</span>(<span class="st">&quot;logr.autolog&quot;</span> <span class="ot">=</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>        <span class="st">&quot;logr.notes&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>        <span class="st">&quot;logr.on&quot;</span> <span class="ot">=</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>        <span class="st">&quot;procs.print&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co"># Get temp directory</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> <span class="fu">tempdir</span>()</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co"># Open log</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>lf <span class="ot">&lt;-</span> <span class="fu">log_open</span>(<span class="fu">file.path</span>(tmp, <span class="st">&quot;example2.log&quot;</span>))</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co"># Get data</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="at">package =</span> <span class="st">&quot;sassy&quot;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co"># Get Data ----------------------------------------------------------------</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Prepare Data&quot;</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co"># Create libname for csv data</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="fu">libname</span>(sdtm, dir, <span class="st">&quot;csv&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># Load data into workspace</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="fu">lib_load</span>(sdtm) </span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Filter DM data&quot;</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">datastep</span>(sdtm.DM, </span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>         <span class="at">keep =</span> <span class="fu">v</span>(USUBJID, ARM, ARMCD),</span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>         <span class="at">where =</span> <span class="fu">expression</span>(ARM <span class="sc">!=</span> <span class="st">&quot;SCREEN FAILURE&quot;</span>), {}) <span class="ot">-&gt;</span> dm</span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Get population counts&quot;</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="fu">proc_freq</span>(dm, <span class="at">tables =</span> ARM, </span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>          <span class="at">output =</span> long, </span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a>          <span class="at">options =</span> <span class="fu">v</span>(nopercent, nonobs)) <span class="ot">-&gt;</span> arm_pop </span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="fu">put</span> (<span class="st">&quot;Create lookup for AE severity&quot;</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>sevn <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">MILD =</span> <span class="dv">1</span>, <span class="at">MODERATE =</span> <span class="dv">2</span>, <span class="at">SEVERE =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span> <span class="fu">put</span>()</span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Prepare table data&quot;</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="fu">datastep</span>(sdtm.AE, <span class="at">merge =</span> dm, </span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>         <span class="at">merge_by =</span> <span class="st">&quot;USUBJID&quot;</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>         <span class="at">merge_in =</span> <span class="fu">v</span>(inA, inB),</span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>         <span class="at">keep =</span> <span class="fu">v</span>(USUBJID, ARM, AESEV, AESEVN, AESOC, AEDECOD),</span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>         <span class="at">where =</span> <span class="fu">expression</span>(inB <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> inA <span class="sc">!=</span> <span class="dv">0</span>), </span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a>         {</span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a>           AESEVN <span class="ot">&lt;-</span> <span class="fu">fapply</span>(AESEV, sevn)   </span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> ae_sub </span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a><span class="co"># Prepare Formats ---------------------------------------------------------</span></span>
+<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Prepare Formats&quot;</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">fcat</span>(<span class="at">CNT =</span> <span class="st">&quot;%3d&quot;</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a>           <span class="at">PCT =</span> <span class="st">&quot;(%5.1f)&quot;</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a>           <span class="at">CAT2 =</span> <span class="fu">c</span>(<span class="at">MILD =</span> <span class="st">&quot;Mild&quot;</span>, </span>
+<span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a>                    <span class="at">MODERATE =</span> <span class="st">&quot;Moderate&quot;</span>, </span>
+<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a>                    <span class="at">SEVERE =</span> <span class="st">&quot;Severe&quot;</span>))</span>
+<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a><span class="co"># Perform Calculations ----------------------------------------------------</span></span>
+<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Perform Calculations&quot;</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a></span>
+<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Get SOC Frequencies&quot;</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a><span class="fu">proc_freq</span>(ae_sub, </span>
+<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a>          <span class="at">tables =</span> <span class="fu">v</span>(AESOC <span class="sc">*</span> AESEV),</span>
+<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a>          <span class="at">by =</span> <span class="st">&quot;ARM&quot;</span>) <span class="ot">-&gt;</span> ae_soc </span>
+<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Combine columns for SOC&quot;</span>)</span>
+<span id="cb1-74"><a href="#cb1-74" tabindex="-1"></a><span class="fu">datastep</span>(ae_soc, </span>
+<span id="cb1-75"><a href="#cb1-75" tabindex="-1"></a>         <span class="at">format =</span> fc,</span>
+<span id="cb1-76"><a href="#cb1-76" tabindex="-1"></a>         <span class="at">rename =</span> <span class="fu">list</span>(<span class="at">VAR1 =</span> <span class="st">&quot;VAR&quot;</span>, <span class="at">CAT1 =</span> <span class="st">&quot;CAT&quot;</span>),</span>
+<span id="cb1-77"><a href="#cb1-77" tabindex="-1"></a>         <span class="at">drop =</span> <span class="fu">v</span>(VAR2, CNT, PCT),</span>
+<span id="cb1-78"><a href="#cb1-78" tabindex="-1"></a>         {</span>
+<span id="cb1-79"><a href="#cb1-79" tabindex="-1"></a>           VARORD <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-80"><a href="#cb1-80" tabindex="-1"></a>           CNTPCT <span class="ot">&lt;-</span> <span class="fu">fapply2</span>(CNT, PCT)</span>
+<span id="cb1-81"><a href="#cb1-81" tabindex="-1"></a>           CAT2 <span class="ot">&lt;-</span> <span class="fu">fapply</span>(CAT2)</span>
+<span id="cb1-82"><a href="#cb1-82" tabindex="-1"></a>           </span>
+<span id="cb1-83"><a href="#cb1-83" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> ae_soc_c</span>
+<span id="cb1-84"><a href="#cb1-84" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Pivot SOC frequencies&quot;</span>)</span>
+<span id="cb1-87"><a href="#cb1-87" tabindex="-1"></a><span class="fu">proc_transpose</span>(ae_soc_c, <span class="at">id =</span> <span class="fu">v</span>(BY, CAT2), </span>
+<span id="cb1-88"><a href="#cb1-88" tabindex="-1"></a>               <span class="at">var =</span> CNTPCT, </span>
+<span id="cb1-89"><a href="#cb1-89" tabindex="-1"></a>               <span class="at">copy =</span> <span class="fu">v</span>(VAR, VARORD),</span>
+<span id="cb1-90"><a href="#cb1-90" tabindex="-1"></a>               <span class="at">by =</span> CAT) <span class="ot">-&gt;</span> ae_soc_t </span>
+<span id="cb1-91"><a href="#cb1-91" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Get PT Frequencies&quot;</span>)</span>
+<span id="cb1-94"><a href="#cb1-94" tabindex="-1"></a><span class="fu">proc_freq</span>(ae_sub, </span>
+<span id="cb1-95"><a href="#cb1-95" tabindex="-1"></a>          <span class="at">tables =</span> <span class="st">&quot;AEDECOD * AESEV&quot;</span>,</span>
+<span id="cb1-96"><a href="#cb1-96" tabindex="-1"></a>          <span class="at">by =</span> <span class="st">&quot;ARM&quot;</span>,</span>
+<span id="cb1-97"><a href="#cb1-97" tabindex="-1"></a>          <span class="at">options =</span> nonobs) <span class="ot">-&gt;</span> ae_pt </span>
+<span id="cb1-98"><a href="#cb1-98" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Get unique SOC and PT combinations&quot;</span>)</span>
+<span id="cb1-100"><a href="#cb1-100" tabindex="-1"></a><span class="fu">proc_sort</span>(ae_sub, <span class="at">keep =</span> <span class="fu">v</span>(AESOC, AEDECOD), </span>
+<span id="cb1-101"><a href="#cb1-101" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">v</span>(AESOC, AEDECOD), <span class="at">options =</span> nodupkey) <span class="ot">-&gt;</span> evnts </span>
+<span id="cb1-102"><a href="#cb1-102" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Combine columns for PT&quot;</span>)</span>
+<span id="cb1-104"><a href="#cb1-104" tabindex="-1"></a><span class="fu">datastep</span>(ae_pt, </span>
+<span id="cb1-105"><a href="#cb1-105" tabindex="-1"></a>         <span class="at">format =</span> fc,</span>
+<span id="cb1-106"><a href="#cb1-106" tabindex="-1"></a>         <span class="at">rename =</span> <span class="fu">list</span>(<span class="at">VAR1 =</span> <span class="st">&quot;VAR&quot;</span>, <span class="at">CAT1 =</span> <span class="st">&quot;CAT&quot;</span>),</span>
+<span id="cb1-107"><a href="#cb1-107" tabindex="-1"></a>         <span class="at">drop =</span> <span class="fu">v</span>(VAR2, CNT, PCT),</span>
+<span id="cb1-108"><a href="#cb1-108" tabindex="-1"></a>         {</span>
+<span id="cb1-109"><a href="#cb1-109" tabindex="-1"></a>           VARORD <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-110"><a href="#cb1-110" tabindex="-1"></a>           CNTPCT <span class="ot">&lt;-</span> <span class="fu">fapply2</span>(CNT, PCT)</span>
+<span id="cb1-111"><a href="#cb1-111" tabindex="-1"></a>           CAT2 <span class="ot">&lt;-</span> <span class="fu">fapply</span>(CAT2)</span>
+<span id="cb1-112"><a href="#cb1-112" tabindex="-1"></a>           </span>
+<span id="cb1-113"><a href="#cb1-113" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> ae_pt_c </span>
+<span id="cb1-114"><a href="#cb1-114" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Pivot PT frequencies&quot;</span>)</span>
+<span id="cb1-117"><a href="#cb1-117" tabindex="-1"></a><span class="fu">proc_transpose</span>(ae_pt_c, <span class="at">id =</span> <span class="fu">v</span>(BY, CAT2), </span>
+<span id="cb1-118"><a href="#cb1-118" tabindex="-1"></a>               <span class="at">var =</span> CNTPCT, </span>
+<span id="cb1-119"><a href="#cb1-119" tabindex="-1"></a>               <span class="at">copy =</span> <span class="fu">v</span>(VAR, VARORD),</span>
+<span id="cb1-120"><a href="#cb1-120" tabindex="-1"></a>               <span class="at">by =</span> CAT) <span class="ot">-&gt;</span> ae_pt_t </span>
+<span id="cb1-121"><a href="#cb1-121" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" tabindex="-1"></a>nms <span class="ot">&lt;-</span> <span class="fu">names</span>(ae_soc_t) </span>
+<span id="cb1-123"><a href="#cb1-123" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Join in SOC&quot;</span>)</span>
+<span id="cb1-125"><a href="#cb1-125" tabindex="-1"></a><span class="fu">datastep</span>(ae_pt_t, <span class="at">merge =</span> evnts, <span class="at">rename =</span> <span class="fu">c</span>(<span class="at">CAT =</span> <span class="st">&quot;CAT2&quot;</span>, <span class="at">AESOC =</span> <span class="st">&quot;CAT&quot;</span>), </span>
+<span id="cb1-126"><a href="#cb1-126" tabindex="-1"></a>         <span class="at">merge_by =</span> <span class="fu">c</span>(<span class="at">CAT =</span> <span class="st">&quot;AEDECOD&quot;</span>), {</span>
+<span id="cb1-127"><a href="#cb1-127" tabindex="-1"></a>           CAT <span class="ot">&lt;-</span> <span class="fu">toTitleCase</span>(<span class="fu">tolower</span>(CAT))</span>
+<span id="cb1-128"><a href="#cb1-128" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> ae_pt_tj </span>
+<span id="cb1-129"><a href="#cb1-129" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Stack SOC and PT counts&quot;</span>)</span>
+<span id="cb1-131"><a href="#cb1-131" tabindex="-1"></a><span class="fu">datastep</span>(ae_soc_t, <span class="at">set =</span> ae_pt_tj, </span>
+<span id="cb1-132"><a href="#cb1-132" tabindex="-1"></a>         <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;VAR&quot;</span>, <span class="st">&quot;CAT&quot;</span>, <span class="st">&quot;CAT2&quot;</span>, <span class="st">&quot;VARORD&quot;</span>, </span>
+<span id="cb1-133"><a href="#cb1-133" tabindex="-1"></a>                  <span class="fu">find.names</span>(ae_pt_tj, <span class="st">&quot;ARM*&quot;</span>)), {}) <span class="ot">-&gt;</span> ae_soc_pt </span>
+<span id="cb1-134"><a href="#cb1-134" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" tabindex="-1"></a>aefinal <span class="ot">&lt;-</span> <span class="fu">proc_sort</span>(ae_soc_pt, <span class="at">by =</span> <span class="fu">v</span>( CAT, VARORD, CAT2))</span>
+<span id="cb1-137"><a href="#cb1-137" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" tabindex="-1"></a><span class="co"># All Adverse Events ------------------------------------------------------</span></span>
+<span id="cb1-141"><a href="#cb1-141" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Get frequencies for all events&quot;</span>)</span>
+<span id="cb1-143"><a href="#cb1-143" tabindex="-1"></a><span class="fu">proc_freq</span>(ae_sub, <span class="at">tables =</span> <span class="st">&quot;AESEV&quot;</span>, <span class="at">by =</span> <span class="fu">v</span>(ARM)) <span class="ot">-&gt;</span> allfreq </span>
+<span id="cb1-144"><a href="#cb1-144" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Combine all events.&quot;</span>)</span>
+<span id="cb1-146"><a href="#cb1-146" tabindex="-1"></a><span class="fu">datastep</span>(allfreq, <span class="at">format =</span> fc,</span>
+<span id="cb1-147"><a href="#cb1-147" tabindex="-1"></a>         <span class="at">drop =</span> <span class="fu">v</span>(N, CNT, PCT),</span>
+<span id="cb1-148"><a href="#cb1-148" tabindex="-1"></a>         {</span>
+<span id="cb1-149"><a href="#cb1-149" tabindex="-1"></a>           </span>
+<span id="cb1-150"><a href="#cb1-150" tabindex="-1"></a>           CNTPCT <span class="ot">&lt;-</span> <span class="fu">fapply2</span>(CNT, PCT)</span>
+<span id="cb1-151"><a href="#cb1-151" tabindex="-1"></a>           CAT <span class="ot">&lt;-</span> <span class="fu">fapply</span>(CAT, fc<span class="sc">$</span>CAT2)</span>
+<span id="cb1-152"><a href="#cb1-152" tabindex="-1"></a>           </span>
+<span id="cb1-153"><a href="#cb1-153" tabindex="-1"></a>           </span>
+<span id="cb1-154"><a href="#cb1-154" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> allfreqm </span>
+<span id="cb1-155"><a href="#cb1-155" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Prepare data for reporting&quot;</span>)</span>
+<span id="cb1-157"><a href="#cb1-157" tabindex="-1"></a><span class="fu">proc_transpose</span>(allfreqm, <span class="at">id =</span> <span class="fu">v</span>(BY, CAT), </span>
+<span id="cb1-158"><a href="#cb1-158" tabindex="-1"></a>               <span class="at">var =</span> CNTPCT, <span class="at">copy =</span> VAR, <span class="at">name =</span> CAT) <span class="ot">-&gt;</span> allfreqt </span>
+<span id="cb1-159"><a href="#cb1-159" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" tabindex="-1"></a><span class="co"># Final Data --------------------------------------------------------------</span></span>
+<span id="cb1-162"><a href="#cb1-162" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Create final data frame&quot;</span>)</span>
+<span id="cb1-165"><a href="#cb1-165" tabindex="-1"></a><span class="fu">datastep</span>(allfreqt, <span class="at">set =</span> aefinal, </span>
+<span id="cb1-166"><a href="#cb1-166" tabindex="-1"></a>         <span class="at">keep =</span> <span class="fu">names</span>(aefinal),</span>
+<span id="cb1-167"><a href="#cb1-167" tabindex="-1"></a>         {</span>
+<span id="cb1-168"><a href="#cb1-168" tabindex="-1"></a>           <span class="cf">if</span> (VAR <span class="sc">==</span> <span class="st">&quot;AESEV&quot;</span>)</span>
+<span id="cb1-169"><a href="#cb1-169" tabindex="-1"></a>             CAT <span class="ot">&lt;-</span> <span class="st">&quot;All Adverse Events&quot;</span></span>
+<span id="cb1-170"><a href="#cb1-170" tabindex="-1"></a>           </span>
+<span id="cb1-171"><a href="#cb1-171" tabindex="-1"></a>         }) <span class="ot">-&gt;</span> allfinal </span>
+<span id="cb1-172"><a href="#cb1-172" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" tabindex="-1"></a><span class="co"># Print Report ----------------------------------------------------------</span></span>
+<span id="cb1-174"><a href="#cb1-174" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Create and print report&quot;</span>)</span>
+<span id="cb1-176"><a href="#cb1-176" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Create table object&quot;</span>)</span>
+<span id="cb1-178"><a href="#cb1-178" tabindex="-1"></a>tbl <span class="ot">&lt;-</span> <span class="fu">create_table</span>(allfinal, <span class="at">first_row_blank =</span> <span class="cn">TRUE</span>, <span class="at">width =</span> <span class="dv">9</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-179"><a href="#cb1-179" tabindex="-1"></a>  <span class="fu">column_defaults</span>(<span class="at">from =</span> <span class="st">`</span><span class="at">ARM A.Mild</span><span class="st">`</span>, <span class="at">to =</span> <span class="st">`</span><span class="at">ARM D.Severe</span><span class="st">`</span>, <span class="at">width =</span> <span class="dv">1</span>, <span class="at">align =</span> <span class="st">&quot;center&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-180"><a href="#cb1-180" tabindex="-1"></a>  <span class="fu">spanning_header</span>(<span class="st">&quot;ARM A.Mild&quot;</span>, <span class="st">&quot;ARM A.Severe&quot;</span>, <span class="at">label =</span> <span class="st">&quot;ARM A&quot;</span>, <span class="at">n =</span> arm_pop[<span class="st">&quot;ARM A&quot;</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb1-181"><a href="#cb1-181" tabindex="-1"></a>  <span class="fu">spanning_header</span>(<span class="st">&quot;ARM B.Mild&quot;</span>, <span class="st">&quot;ARM B.Severe&quot;</span>, <span class="at">label =</span> <span class="st">&quot;ARM B&quot;</span>, <span class="at">n =</span> arm_pop[<span class="st">&quot;ARM B&quot;</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb1-182"><a href="#cb1-182" tabindex="-1"></a>  <span class="fu">spanning_header</span>(<span class="st">&quot;ARM C.Mild&quot;</span>, <span class="st">&quot;ARM C.Severe&quot;</span>, <span class="at">label =</span> <span class="st">&quot;ARM C&quot;</span>, <span class="at">n =</span> arm_pop[<span class="st">&quot;ARM C&quot;</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb1-183"><a href="#cb1-183" tabindex="-1"></a>  <span class="fu">spanning_header</span>(<span class="st">&quot;ARM D.Mild&quot;</span>, <span class="st">&quot;ARM D.Severe&quot;</span>, <span class="at">label =</span> <span class="st">&quot;ARM D&quot;</span>, <span class="at">n =</span> arm_pop[<span class="st">&quot;ARM D&quot;</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb1-184"><a href="#cb1-184" tabindex="-1"></a>  <span class="fu">stub</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;CAT&quot;</span>, <span class="st">&quot;CAT2&quot;</span>), <span class="at">label =</span> <span class="st">&quot;System Organ Class</span><span class="sc">\n</span><span class="st">   Preferred Term&quot;</span>, <span class="at">width =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-185"><a href="#cb1-185" tabindex="-1"></a>  <span class="fu">define</span>(CAT, <span class="at">blank_after =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-186"><a href="#cb1-186" tabindex="-1"></a>  <span class="fu">define</span>(CAT2, <span class="at">indent =</span> .<span class="dv">25</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-187"><a href="#cb1-187" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM A.Mild</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Mild&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-188"><a href="#cb1-188" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM A.Moderate</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Moderate&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-189"><a href="#cb1-189" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM A.Severe</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Severe&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-190"><a href="#cb1-190" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM B.Mild</span><span class="st">`</span>,  <span class="at">label =</span> <span class="st">&quot;Mild&quot;</span>, <span class="at">page_wrap =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-191"><a href="#cb1-191" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM B.Moderate</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Moderate&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-192"><a href="#cb1-192" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM B.Severe</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Severe&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-193"><a href="#cb1-193" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM C.Mild</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Mild&quot;</span>, <span class="at">page_wrap =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-194"><a href="#cb1-194" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM C.Moderate</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Moderate&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-195"><a href="#cb1-195" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM C.Severe</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Severe&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-196"><a href="#cb1-196" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM D.Mild</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Mild&quot;</span>, <span class="at">page_wrap =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-197"><a href="#cb1-197" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM D.Moderate</span><span class="st">`</span>,<span class="at">label =</span> <span class="st">&quot;Moderate&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-198"><a href="#cb1-198" tabindex="-1"></a>  <span class="fu">define</span>(<span class="st">`</span><span class="at">ARM D.Severe</span><span class="st">`</span>, <span class="at">label =</span> <span class="st">&quot;Severe&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-199"><a href="#cb1-199" tabindex="-1"></a>  <span class="fu">define</span>(VAR, <span class="at">visible =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-200"><a href="#cb1-200" tabindex="-1"></a>  <span class="fu">define</span>(VARORD, <span class="at">visible =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-201"><a href="#cb1-201" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Create report object&quot;</span>)</span>
+<span id="cb1-204"><a href="#cb1-204" tabindex="-1"></a>rpt <span class="ot">&lt;-</span> <span class="fu">create_report</span>(<span class="fu">file.path</span>(tmp, <span class="st">&quot;example2.rtf&quot;</span>), <span class="at">output_type =</span> <span class="st">&quot;RTF&quot;</span>, <span class="at">font =</span> <span class="st">&quot;Arial&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-205"><a href="#cb1-205" tabindex="-1"></a>  <span class="fu">options_fixed</span>(<span class="at">font_size =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-206"><a href="#cb1-206" tabindex="-1"></a>  <span class="fu">page_header</span>(<span class="st">&quot;Sponsor: Company&quot;</span>, <span class="st">&quot;Study: ABC&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-207"><a href="#cb1-207" tabindex="-1"></a>  <span class="fu">titles</span>(<span class="st">&quot;Table 5.0&quot;</span>, <span class="st">&quot;Adverse Events by Maximum Severity&quot;</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-208"><a href="#cb1-208" tabindex="-1"></a>  <span class="fu">add_content</span>(tbl) <span class="sc">|&gt;</span> </span>
+<span id="cb1-209"><a href="#cb1-209" tabindex="-1"></a>  <span class="fu">footnotes</span>(<span class="st">&quot;Program: AE_Table.R&quot;</span>,</span>
+<span id="cb1-210"><a href="#cb1-210" tabindex="-1"></a>            <span class="st">&quot;Note: Adverse events were coded using MedDRA Version 9.1&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-211"><a href="#cb1-211" tabindex="-1"></a>  <span class="fu">page_footer</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;Confidential&quot;</span>, <span class="st">&quot;Page [pg] of [tpg]&quot;</span>) </span>
+<span id="cb1-212"><a href="#cb1-212" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Print report&quot;</span>)</span>
+<span id="cb1-214"><a href="#cb1-214" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">write_report</span>(rpt) </span>
+<span id="cb1-215"><a href="#cb1-215" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" tabindex="-1"></a><span class="co"># Clean Up ----------------------------------------------------------------</span></span>
+<span id="cb1-218"><a href="#cb1-218" tabindex="-1"></a><span class="fu">sep</span>(<span class="st">&quot;Clean Up&quot;</span>)</span>
+<span id="cb1-219"><a href="#cb1-219" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Remove library from workspace&quot;</span>)</span>
+<span id="cb1-221"><a href="#cb1-221" tabindex="-1"></a><span class="fu">lib_unload</span>(sdtm)</span>
+<span id="cb1-222"><a href="#cb1-222" tabindex="-1"></a></span>
+<span id="cb1-223"><a href="#cb1-223" tabindex="-1"></a><span class="fu">put</span>(<span class="st">&quot;Close log&quot;</span>)</span>
+<span id="cb1-224"><a href="#cb1-224" tabindex="-1"></a><span class="fu">log_close</span>()</span>
+<span id="cb1-225"><a href="#cb1-225" tabindex="-1"></a></span>
+<span id="cb1-226"><a href="#cb1-226" tabindex="-1"></a></span>
+<span id="cb1-227"><a href="#cb1-227" tabindex="-1"></a><span class="co"># Uncomment to view report</span></span>
+<span id="cb1-228"><a href="#cb1-228" tabindex="-1"></a><span class="co"># file.show(res$modified_path)</span></span>
+<span id="cb1-229"><a href="#cb1-229" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" tabindex="-1"></a><span class="co"># Uncomment to view log</span></span>
+<span id="cb1-231"><a href="#cb1-231" tabindex="-1"></a><span class="co"># file.show(lf)</span></span></code></pre></div>
+</div>
+<div id="output" class="section level2">
+<h2>Output</h2>
+<p>Here is the output:</p>
+<p><img src="data:image/png;base64,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" /></p>
+</div>
+<div id="log" class="section level2">
+<h2>Log</h2>
+<p>And here is the log:</p>
+<pre><code>=========================================================================
+Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpKQddL7/log/example2.log
+Program Path: C:/Projects/Archytas/Demo/example2.R
+Working Directory: C:/Projects/Archytas/Demo
+User Name: dbosa
+R Version: 4.2.1 (2022-06-23 ucrt)
+Machine: SOCRATES x86-64
+Operating System: Windows 10 x64 build 19044
+Base Packages: stats graphics grDevices utils datasets methods base Other
+Packages: tidylog_1.0.2 procs_0.0.9007 reporter_1.3.7 libr_1.2.6 fmtr_1.5.9
+logr_1.3.3 common_1.0.5 sassy_1.0.8
+Log Start Time: 2022-10-15 20:24:55
+=========================================================================
+
+=========================================================================
+Prepare Data
+=========================================================================
+
+# library &#39;sdtm&#39;: 8 items
+- attributes: csv not loaded
+- path: ./data
+- items:
+  Name Extension Rows Cols     Size
+1   AE       csv  150   27  88.2 Kb
+2   DA       csv 3587   18   528 Kb
+3   DM       csv   87   24  45.3 Kb
+4   DS       csv  174    9  33.8 Kb
+5   EX       csv   84   11  26.1 Kb
+6   IE       csv    2   14  13.1 Kb
+7   SV       csv  685   10  70.1 Kb
+8   VS       csv 3358   17 467.2 Kb
+         LastModified
+1 2020-09-18 14:30:23
+2 2020-09-18 14:30:23
+3 2020-09-18 14:30:23
+4 2022-09-26 16:54:16
+5 2020-09-18 14:30:23
+6 2020-09-18 14:30:23
+7 2020-09-18 14:30:24
+8 2020-09-18 14:30:24
+
+lib_load: library &#39;sdtm&#39; loaded
+
+Filter DM data
+
+datastep: columns decreased from 24 to 3
+
+# A tibble: 85 × 3
+   USUBJID    ARM   ARMCD
+   &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;
+ 1 ABC-01-049 ARM D 4    
+ 2 ABC-01-050 ARM B 2    
+ 3 ABC-01-051 ARM A 1    
+ 4 ABC-01-052 ARM C 3    
+ 5 ABC-01-053 ARM B 2    
+ 6 ABC-01-054 ARM D 4    
+ 7 ABC-01-055 ARM C 3    
+ 8 ABC-01-056 ARM A 1    
+ 9 ABC-01-113 ARM D 4    
+10 ABC-01-114 ARM B 2    
+# … with 75 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+Get population counts
+
+proc_freq: input data set 85 rows and 3 columns
+           tables: ARM
+           view: TRUE
+           output: 1 datasets
+
+# A tibble: 1 × 6
+  VAR   STAT  `ARM A` `ARM B` `ARM C`
+  &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 ARM   CNT        20      21      21
+# … with 1 more variable: `ARM D` &lt;dbl&gt;
+# ℹ Use `colnames()` to see all variable names
+
+Create lookup for AE severity
+
+    MILD MODERATE   SEVERE 
+       1        2        3 
+
+Prepare table data
+
+datastep: columns decreased from 27 to 6
+
+# A tibble: 145 × 6
+   USUBJID ARM   AESEV AESEVN AESOC AEDECOD
+   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  
+ 1 ABC-01… ARM D MODE…      2 Inve… BLOOD …
+ 2 ABC-01… ARM D MODE…      2 Inve… BLOOD …
+ 3 ABC-01… ARM D MILD       1 Musc… MUSCUL…
+ 4 ABC-01… ARM D MILD       1 Nerv… HEADAC…
+ 5 ABC-01… ARM D MODE…      2 Inve… LABORA…
+ 6 ABC-01… ARM B MILD       1 Resp… UPPER …
+ 7 ABC-01… ARM B MILD       1 Skin… RASH   
+ 8 ABC-01… ARM A MILD       1 Nerv… HEADAC…
+ 9 ABC-01… ARM A MILD       1 Nerv… HEADAC…
+10 ABC-01… ARM A MILD       1 Gene… INFLUE…
+# … with 135 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+=========================================================================
+Prepare Formats
+=========================================================================
+
+# A format catalog: 3 formats
+- $CNT: type S, &quot;%3d&quot;
+- $PCT: type S, &quot;(%5.1f)&quot;
+- $CAT2: type V, 3 elements
+
+=========================================================================
+Perform Calculations
+=========================================================================
+
+Get SOC Frequencies
+
+proc_freq: input data set 145 rows and 6 columns
+           tables: AESOC * AESEV
+           by: ARM
+           view: TRUE
+           output: 1 datasets
+
+# A tibble: 240 × 8
+   BY    VAR1  VAR2  CAT1       CAT2      N
+   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;
+ 1 ARM A AESOC AESEV Blood and… MILD     37
+ 2 ARM A AESOC AESEV Blood and… MODE…    37
+ 3 ARM A AESOC AESEV Blood and… SEVE…    37
+ 4 ARM A AESOC AESEV Cardiac d… MILD     37
+ 5 ARM A AESOC AESEV Cardiac d… MODE…    37
+ 6 ARM A AESOC AESEV Cardiac d… SEVE…    37
+ 7 ARM A AESOC AESEV Congenita… MILD     37
+ 8 ARM A AESOC AESEV Congenita… MODE…    37
+ 9 ARM A AESOC AESEV Congenita… SEVE…    37
+10 ARM A AESOC AESEV Ear and l… MILD     37
+# … with 230 more rows, and 2 more
+#   variables: CNT &lt;dbl&gt;, PCT &lt;dbl&gt;
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Combine columns for SOC
+
+datastep: columns decreased from 8 to 7
+
+# A tibble: 240 × 7
+   BY    VAR   CAT       CAT2      N VARORD
+   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 ARM A AESOC Blood an… Mild     37      1
+ 2 ARM A AESOC Blood an… Mode…    37      1
+ 3 ARM A AESOC Blood an… Seve…    37      1
+ 4 ARM A AESOC Cardiac … Mild     37      1
+ 5 ARM A AESOC Cardiac … Mode…    37      1
+ 6 ARM A AESOC Cardiac … Seve…    37      1
+ 7 ARM A AESOC Congenit… Mild     37      1
+ 8 ARM A AESOC Congenit… Mode…    37      1
+ 9 ARM A AESOC Congenit… Seve…    37      1
+10 ARM A AESOC Ear and … Mild     37      1
+# … with 230 more rows, and 1 more
+#   variable: CNTPCT &lt;chr&gt;
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Pivot SOC frequencies
+
+proc_transpose: input data set 240 rows and 7 columns
+                by: CAT
+                var: CNTPCT
+                id: BY CAT2
+                copy: VAR VARORD
+                name: NAME
+                output dataset 20 rows and 16 columns
+
+# A tibble: 20 × 16
+   VAR   CAT   VARORD NAME  ARM A…¹ ARM A…²
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;  
+ 1 AESOC Bloo…      1 CNTP… &quot;  0 (… &quot;  0 (…
+ 2 AESOC Card…      1 CNTP… &quot;  0 (… &quot;  0 (…
+ 3 AESOC Cong…      1 CNTP… &quot;  0 (… &quot;  0 (…
+ 4 AESOC Ear …      1 CNTP… &quot;  0 (… &quot;  0 (…
+ 5 AESOC Endo…      1 CNTP… &quot;  0 (… &quot;  0 (…
+ 6 AESOC Gast…      1 CNTP… &quot;  0 (… &quot;  1 (…
+ 7 AESOC Gene…      1 CNTP… &quot;  2 (… &quot;  0 (…
+ 8 AESOC Infe…      1 CNTP… &quot;  7 (… &quot;  5 (…
+ 9 AESOC Inju…      1 CNTP… &quot;  0 (… &quot;  0 (…
+10 AESOC Inve…      1 CNTP… &quot;  4 (… &quot;  2 (…
+11 AESOC Meta…      1 CNTP… &quot;  0 (… &quot;  0 (…
+12 AESOC Musc…      1 CNTP… &quot;  3 (… &quot;  0 (…
+13 AESOC Neop…      1 CNTP… &quot;  0 (… &quot;  0 (…
+14 AESOC Nerv…      1 CNTP… &quot;  7 (… &quot;  0 (…
+15 AESOC Psyc…      1 CNTP… &quot;  0 (… &quot;  1 (…
+16 AESOC Rena…      1 CNTP… &quot;  1 (… &quot;  0 (…
+17 AESOC Resp…      1 CNTP… &quot;  2 (… &quot;  1 (…
+18 AESOC Skin…      1 CNTP… &quot;  1 (… &quot;  0 (…
+19 AESOC Surg…      1 CNTP… &quot;  0 (… &quot;  0 (…
+20 AESOC Vasc…      1 CNTP… &quot;  0 (… &quot;  0 (…
+# … with 10 more variables:
+#   `ARM A.Severe` &lt;chr&gt;,
+#   `ARM B.Mild` &lt;chr&gt;,
+#   `ARM B.Moderate` &lt;chr&gt;,
+#   `ARM B.Severe` &lt;chr&gt;,
+#   `ARM C.Mild` &lt;chr&gt;,
+#   `ARM C.Moderate` &lt;chr&gt;, …
+# ℹ Use `colnames()` to see all variable names
+
+Get PT Frequencies
+
+proc_freq: input data set 145 rows and 6 columns
+           tables: AEDECOD * AESEV
+           by: ARM
+           view: TRUE
+           output: 1 datasets
+
+# A tibble: 876 × 7
+   BY    VAR1    VAR2  CAT1     CAT2    CNT
+   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;
+ 1 ARM A AEDECOD AESEV ANXIETY  MILD      0
+ 2 ARM A AEDECOD AESEV ANXIETY  MODE…     0
+ 3 ARM A AEDECOD AESEV ANXIETY  SEVE…     0
+ 4 ARM A AEDECOD AESEV APPLICA… MILD      0
+ 5 ARM A AEDECOD AESEV APPLICA… MODE…     0
+ 6 ARM A AEDECOD AESEV APPLICA… SEVE…     0
+ 7 ARM A AEDECOD AESEV APPLICA… MILD      0
+ 8 ARM A AEDECOD AESEV APPLICA… MODE…     0
+ 9 ARM A AEDECOD AESEV APPLICA… SEVE…     0
+10 ARM A AEDECOD AESEV BACK PA… MILD      2
+# … with 866 more rows, and 1 more
+#   variable: PCT &lt;dbl&gt;
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Get unique SOC and PT combinations
+
+proc_sort: input data set 73 rows and 6 columns
+           by: AESOC AEDECOD
+           keep: AESOC AEDECOD
+           order: a a
+           nodupkey: TRUE
+           output data set 73 rows and 2 columns
+
+# A tibble: 73 × 2
+   AESOC                            AEDECOD
+   &lt;chr&gt;                            &lt;chr&gt;  
+ 1 Blood and lymphatic system diso… NEUTRO…
+ 2 Cardiac disorders                PALPIT…
+ 3 Cardiac disorders                SINUS …
+ 4 Congenital, familial and geneti… DERMOI…
+ 5 Ear and labyrinth disorders      VERTIGO
+ 6 Endocrine disorders              PARATH…
+ 7 Gastrointestinal disorders       DIARRH…
+ 8 Gastrointestinal disorders       FOOD P…
+ 9 Gastrointestinal disorders       TOOTHA…
+10 Gastrointestinal disorders       VOMITI…
+# … with 63 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+Combine columns for PT
+
+datastep: columns decreased from 7 to 6
+
+# A tibble: 876 × 6
+   BY    VAR     CAT    CAT2  VARORD CNTPCT
+   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; 
+ 1 ARM A AEDECOD ANXIE… Mild       2 &quot;  0 …
+ 2 ARM A AEDECOD ANXIE… Mode…      2 &quot;  0 …
+ 3 ARM A AEDECOD ANXIE… Seve…      2 &quot;  0 …
+ 4 ARM A AEDECOD APPLI… Mild       2 &quot;  0 …
+ 5 ARM A AEDECOD APPLI… Mode…      2 &quot;  0 …
+ 6 ARM A AEDECOD APPLI… Seve…      2 &quot;  0 …
+ 7 ARM A AEDECOD APPLI… Mild       2 &quot;  0 …
+ 8 ARM A AEDECOD APPLI… Mode…      2 &quot;  0 …
+ 9 ARM A AEDECOD APPLI… Seve…      2 &quot;  0 …
+10 ARM A AEDECOD BACK … Mild       2 &quot;  2 …
+# … with 866 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+Pivot PT frequencies
+
+proc_transpose: input data set 876 rows and 6 columns
+                by: CAT
+                var: CNTPCT
+                id: BY CAT2
+                copy: VAR VARORD
+                name: NAME
+                output dataset 73 rows and 16 columns
+
+# A tibble: 73 × 16
+   VAR   CAT   VARORD NAME  ARM A…¹ ARM A…²
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;  
+ 1 AEDE… ANXI…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 2 AEDE… APPL…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 3 AEDE… APPL…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 4 AEDE… BACK…      2 CNTP… &quot;  2 (… &quot;  0 (…
+ 5 AEDE… BASA…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 6 AEDE… BLOO…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 7 AEDE… BLOO…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 8 AEDE… BLOO…      2 CNTP… &quot;  0 (… &quot;  1 (…
+ 9 AEDE… BLOO…      2 CNTP… &quot;  1 (… &quot;  1 (…
+10 AEDE… BLOO…      2 CNTP… &quot;  0 (… &quot;  0 (…
+# … with 63 more rows, 10 more variables:
+#   `ARM A.Severe` &lt;chr&gt;,
+#   `ARM B.Mild` &lt;chr&gt;,
+#   `ARM B.Moderate` &lt;chr&gt;,
+#   `ARM B.Severe` &lt;chr&gt;,
+#   `ARM C.Mild` &lt;chr&gt;,
+#   `ARM C.Moderate` &lt;chr&gt;, …
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Join in SOC
+
+datastep: columns increased from 16 to 17
+
+# A tibble: 73 × 17
+   VAR   CAT2  VARORD NAME  ARM A…¹ ARM A…²
+   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;  
+ 1 AEDE… Anxi…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 2 AEDE… Appl…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 3 AEDE… Appl…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 4 AEDE… Back…      2 CNTP… &quot;  2 (… &quot;  0 (…
+ 5 AEDE… Basa…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 6 AEDE… Bloo…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 7 AEDE… Bloo…      2 CNTP… &quot;  0 (… &quot;  0 (…
+ 8 AEDE… Bloo…      2 CNTP… &quot;  0 (… &quot;  1 (…
+ 9 AEDE… Bloo…      2 CNTP… &quot;  1 (… &quot;  1 (…
+10 AEDE… Bloo…      2 CNTP… &quot;  0 (… &quot;  0 (…
+# … with 63 more rows, 11 more variables:
+#   `ARM A.Severe` &lt;chr&gt;,
+#   `ARM B.Mild` &lt;chr&gt;,
+#   `ARM B.Moderate` &lt;chr&gt;,
+#   `ARM B.Severe` &lt;chr&gt;,
+#   `ARM C.Mild` &lt;chr&gt;,
+#   `ARM C.Moderate` &lt;chr&gt;, …
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Stack SOC and PT counts
+
+datastep: columns started with 16 and ended with 16
+
+# A tibble: 93 × 16
+   VAR   CAT      CAT2  VARORD ARM A…¹ ARM A…² ARM A…³ ARM B…⁴ ARM B…⁵ ARM B…⁶ ARM C…⁷ ARM C…⁸
+   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 AESOC Blood a… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+ 2 AESOC Cardiac… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 3 AESOC Congeni… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 4 AESOC Ear and… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 5 AESOC Endocri… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (…
+ 6 AESOC Gastroi… &lt;NA&gt;       1 &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  4 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 7 AESOC General… &lt;NA&gt;       1 &quot;  2 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  3 (… &quot;  0 (…
+ 8 AESOC Infecti… &lt;NA&gt;       1 &quot;  7 (… &quot;  5 (… &quot;  0 (… &quot;  7 (… &quot;  1 (… &quot;  0 (… &quot;  6 (… &quot;  3 (…
+ 9 AESOC Injury,… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+10 AESOC Investi… &lt;NA&gt;       1 &quot;  4 (… &quot;  2 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  2 (… &quot;  1 (…
+# … with 83 more rows, 4 more variables: `ARM C.Severe` &lt;chr&gt;, `ARM D.Mild` &lt;chr&gt;,
+#   `ARM D.Moderate` &lt;chr&gt;, `ARM D.Severe` &lt;chr&gt;, and abbreviated variable names
+#   ¹​`ARM A.Mild`, ²​`ARM A.Moderate`, ³​`ARM A.Severe`, ⁴​`ARM B.Mild`, ⁵​`ARM B.Moderate`,
+#   ⁶​`ARM B.Severe`, ⁷​`ARM C.Mild`, ⁸​`ARM C.Moderate`
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+proc_sort: input data set 93 rows and 16 columns
+           by: CAT VARORD CAT2
+           keep: VAR CAT CAT2 VARORD ARM A.Mild ARM A.Moderate ARM A.Severe ARM B.Mild ARM B.Moderate ARM B.Severe ARM C.Mild ARM C.Moderate ARM C.Severe ARM D.Mild ARM D.Moderate ARM D.Severe
+           order: a a a
+           nodupkey: FALSE
+           output data set 93 rows and 16 columns
+
+# A tibble: 93 × 16
+   VAR     CAT    CAT2  VARORD ARM A…¹ ARM A…² ARM A…³ ARM B…⁴ ARM B…⁵ ARM B…⁶ ARM C…⁷ ARM C…⁸
+   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 AESOC   Blood… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+ 2 AEDECOD Blood… Neut…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+ 3 AESOC   Cardi… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 4 AEDECOD Cardi… Palp…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 5 AEDECOD Cardi… Sinu…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 6 AESOC   Conge… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 7 AEDECOD Conge… Derm…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 8 AESOC   Ear a… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 9 AEDECOD Ear a… Vert…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+10 AESOC   Endoc… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (…
+# … with 83 more rows, 4 more variables: `ARM C.Severe` &lt;chr&gt;, `ARM D.Mild` &lt;chr&gt;,
+#   `ARM D.Moderate` &lt;chr&gt;, `ARM D.Severe` &lt;chr&gt;, and abbreviated variable names
+#   ¹​`ARM A.Mild`, ²​`ARM A.Moderate`, ³​`ARM A.Severe`, ⁴​`ARM B.Mild`, ⁵​`ARM B.Moderate`,
+#   ⁶​`ARM B.Severe`, ⁷​`ARM C.Mild`, ⁸​`ARM C.Moderate`
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+Get frequencies for all events
+
+proc_freq: input data set 145 rows and 6 columns
+           tables: AESEV
+           by: ARM
+           view: TRUE
+           output: 1 datasets
+
+# A tibble: 12 × 6
+   BY    VAR   CAT          N   CNT   PCT
+   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 ARM A AESEV MILD        37    27 73.0 
+ 2 ARM A AESEV MODERATE    37    10 27.0 
+ 3 ARM A AESEV SEVERE      37     0  0   
+ 4 ARM B AESEV MILD        32    24 75   
+ 5 ARM B AESEV MODERATE    32     6 18.8 
+ 6 ARM B AESEV SEVERE      32     2  6.25
+ 7 ARM C AESEV MILD        36    29 80.6 
+ 8 ARM C AESEV MODERATE    36     7 19.4 
+ 9 ARM C AESEV SEVERE      36     0  0   
+10 ARM D AESEV MILD        40    31 77.5 
+11 ARM D AESEV MODERATE    40     9 22.5 
+12 ARM D AESEV SEVERE      40     0  0   
+
+Combine all events.
+
+datastep: columns decreased from 6 to 4
+
+# A tibble: 12 × 4
+   BY    VAR   CAT      CNTPCT       
+   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;        
+ 1 ARM A AESEV Mild     &quot; 27 ( 73.0)&quot;
+ 2 ARM A AESEV Moderate &quot; 10 ( 27.0)&quot;
+ 3 ARM A AESEV Severe   &quot;  0 (  0.0)&quot;
+ 4 ARM B AESEV Mild     &quot; 24 ( 75.0)&quot;
+ 5 ARM B AESEV Moderate &quot;  6 ( 18.8)&quot;
+ 6 ARM B AESEV Severe   &quot;  2 (  6.2)&quot;
+ 7 ARM C AESEV Mild     &quot; 29 ( 80.6)&quot;
+ 8 ARM C AESEV Moderate &quot;  7 ( 19.4)&quot;
+ 9 ARM C AESEV Severe   &quot;  0 (  0.0)&quot;
+10 ARM D AESEV Mild     &quot; 31 ( 77.5)&quot;
+11 ARM D AESEV Moderate &quot;  9 ( 22.5)&quot;
+12 ARM D AESEV Severe   &quot;  0 (  0.0)&quot;
+
+Prepare data for reporting
+
+proc_transpose: input data set 12 rows and 4 columns
+                var: CNTPCT
+                id: BY CAT
+                copy: VAR
+                name: CAT
+                output dataset 1 rows and 14 columns
+
+# A tibble: 1 × 14
+  VAR   CAT    ARM A…¹ ARM A…² ARM A…³ ARM B…⁴ ARM B…⁵ ARM B…⁶ ARM C…⁷ ARM C…⁸ ARM C…⁹ ARM D…˟
+  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+1 AESEV CNTPCT &quot; 27 (… &quot; 10 (… &quot;  0 (… &quot; 24 (… &quot;  6 (… &quot;  2 (… &quot; 29 (… &quot;  7 (… &quot;  0 (… &quot; 31 (…
+# … with 2 more variables: `ARM D.Moderate` &lt;chr&gt;, `ARM D.Severe` &lt;chr&gt;, and abbreviated
+#   variable names ¹​`ARM A.Mild`, ²​`ARM A.Moderate`, ³​`ARM A.Severe`, ⁴​`ARM B.Mild`,
+#   ⁵​`ARM B.Moderate`, ⁶​`ARM B.Severe`, ⁷​`ARM C.Mild`, ⁸​`ARM C.Moderate`, ⁹​`ARM C.Severe`,
+#   ˟​`ARM D.Mild`
+# ℹ Use `colnames()` to see all variable names
+
+=========================================================================
+Create final data frame
+=========================================================================
+
+datastep: columns increased from 14 to 16
+
+# A tibble: 94 × 16
+   VAR     CAT    CAT2  VARORD ARM A…¹ ARM A…² ARM A…³ ARM B…⁴ ARM B…⁵ ARM B…⁶ ARM C…⁷ ARM C…⁸
+   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 AESEV   All A… &lt;NA&gt;      NA &quot; 27 (… &quot; 10 (… &quot;  0 (… &quot; 24 (… &quot;  6 (… &quot;  2 (… &quot; 29 (… &quot;  7 (…
+ 2 AESOC   Blood… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+ 3 AEDECOD Blood… Neut…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (…
+ 4 AESOC   Cardi… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 5 AEDECOD Cardi… Palp…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 6 AEDECOD Cardi… Sinu…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 7 AESOC   Conge… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 8 AEDECOD Conge… Derm…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+ 9 AESOC   Ear a… &lt;NA&gt;       1 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+10 AEDECOD Ear a… Vert…      2 &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  0 (… &quot;  1 (… &quot;  0 (… &quot;  0 (… &quot;  0 (…
+# … with 84 more rows, 4 more variables: `ARM C.Severe` &lt;chr&gt;, `ARM D.Mild` &lt;chr&gt;,
+#   `ARM D.Moderate` &lt;chr&gt;, `ARM D.Severe` &lt;chr&gt;, and abbreviated variable names
+#   ¹​`ARM A.Mild`, ²​`ARM A.Moderate`, ³​`ARM A.Severe`, ⁴​`ARM B.Mild`, ⁵​`ARM B.Moderate`,
+#   ⁶​`ARM B.Severe`, ⁷​`ARM C.Mild`, ⁸​`ARM C.Moderate`
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+
+=========================================================================
+Create and print report
+=========================================================================
+
+Create table object
+
+Create report object
+
+Print report
+
+# A report specification: 16 pages
+- file_path: &#39;C:\Users\dbosa\AppData\Local\Temp\RtmpKQddL7/example2.rtf&#39;
+- output_type: RTF
+- units: inches
+- orientation: landscape
+- margins: top 0.5 bottom 0.5 left 1 right 1
+- line size/count: 9/42
+- page_header: left=Sponsor: Company right=Study: ABC
+- title 1: &#39;Table 5.0&#39;
+- title 2: &#39;Adverse Events by Maximum Severity&#39;
+- footnote 1: &#39;Program: AE_Table.R&#39;
+- footnote 2: &#39;Note: Adverse events were coded using MedDRA Version 9.1&#39;
+- page_footer: left=2022-10-15 20:25:00 center=Confidential right=Page [pg] of [tpg]
+- content: 
+# A table specification:
+- data: tibble &#39;allfinal&#39; 94 rows 16 cols
+- show_cols: all
+- use_attributes: all
+- width: 9
+- spanning_header: from=&#39;ARM A.Mild&#39; to=&#39;ARM A.Severe&#39; &#39;ARM A&#39; level=1 
+- spanning_header: from=&#39;ARM B.Mild&#39; to=&#39;ARM B.Severe&#39; &#39;ARM B&#39; level=1 
+- spanning_header: from=&#39;ARM C.Mild&#39; to=&#39;ARM C.Severe&#39; &#39;ARM C&#39; level=1 
+- spanning_header: from=&#39;ARM D.Mild&#39; to=&#39;ARM D.Severe&#39; &#39;ARM D&#39; level=1 
+- stub: CAT CAT2 &#39;System Organ Class
+   Preferred Term&#39; width=5 align=&#39;left&#39; 
+- define: CAT 
+- define: CAT2 
+- define: ARM A.Mild &#39;Mild&#39; 
+- define: ARM A.Moderate &#39;Moderate&#39; 
+- define: ARM A.Severe &#39;Severe&#39; 
+- define: ARM B.Mild &#39;Mild&#39; page_wrap=&#39;TRUE&#39; 
+- define: ARM B.Moderate &#39;Moderate&#39; 
+- define: ARM B.Severe &#39;Severe&#39; 
+- define: ARM C.Mild &#39;Mild&#39; page_wrap=&#39;TRUE&#39; 
+- define: ARM C.Moderate &#39;Moderate&#39; 
+- define: ARM C.Severe &#39;Severe&#39; 
+- define: ARM D.Mild &#39;Mild&#39; page_wrap=&#39;TRUE&#39; 
+- define: ARM D.Moderate &#39;Moderate&#39; 
+- define: ARM D.Severe &#39;Severe&#39; 
+- define: VAR visible=&#39;FALSE&#39; 
+- define: VARORD visible=&#39;FALSE&#39; 
+
+=========================================================================
+Clean Up
+=========================================================================
+
+Remove library from workspace
+
+lib_sync: synchronized data in library &#39;sdtm&#39;
+
+lib_unload: library &#39;sdtm&#39; unloaded
+
+Close log
+
+=========================================================================
+Log End Time: 2022-10-15 20:25:01
+Log Elapsed Time: 0 00:00:06
+=========================================================================
+
+</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
