@@ -170,6 +170,42 @@ get_clm <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
 }
 
 
+#' @noRd
+get_clmstd <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
+
+  if (!is.numeric(alpha))
+    alpha <- as.numeric(alpha)
+
+  if (onesided) {
+    alp <- alpha
+  } else {
+    alp <- alpha / 2
+  }
+
+  # Remove NA
+  if (narm)
+    x <- na.omit(x)
+
+  # Calculate variance
+  x.var <- var(x)
+
+  # Degrees of freedom
+  df <- length(x) - 1L
+
+  # Calculate chisq for upper and lower cl
+  crit.low <- qchisq(alp, df = df, lower.tail = FALSE)
+  crit.upp <- qchisq(alp, df = df, lower.tail = TRUE)
+
+  # Take square root
+  ci <- sqrt(c(low = df*x.var / crit.low, upp = df*x.var / crit.upp))
+
+  # Lower and upper confidence interval boundaries
+  res <- c(ucl = ci[["upp"]],
+           lcl = ci[["low"]],
+           alpha = alpha)
+
+  return(res)
+}
 
 
 #' @noRd

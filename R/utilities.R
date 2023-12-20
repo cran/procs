@@ -10,7 +10,9 @@
 output_report <- function(lst,
                           dir_name, file_name, out_type = 'HTML',
                           style = NULL,
-                          titles = NULL, margins = 1, viewer = FALSE) {
+                          titles = NULL, margins = 1,
+                          viewer = FALSE,
+                          pages = 1) {
 
 
   if (is.null(dir_name)) {
@@ -60,73 +62,120 @@ output_report <- function(lst,
 
   }
 
-
-  for (i in seq_len(length(lst))) {
-    dt <- lst[[i]]
+  for (j in seq_len(pages)) {
 
 
-    if (viewer == TRUE) {
-
-      if ("CAT" %in% names(dt)) {
-        lbl <-  attr(dt$CAT, "label")
-        if (is.null(lbl))
-          lbl <- "CAT"
-        nms <- names(dt)
-        names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
-      }
-
-      if ("stub" %in% names(dt)) {
-       lbl <- attr(dt$stub, "label")
-       if (is.null(lbl))
-         lbl <- ""
-
-      }
-
-      # Create table
-      tbl <- create_table(dt, borders = c("all"))
-
-      # Dedupe stub column if it exists
-      if ("stub" %in% names(dt)) {
-
-        wth <- rpt$char_width * nchar(lbl)
-        tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
-                      standard_eval = "true")
-
-      }
+    if (pages == 1) {
+      pg <- lst
 
     } else {
-
-      # Create table
-      tbl <- create_table(dt, borders = c("outside"))
+      pg <- lst[[j]]
     }
 
-    #
+    for (i in seq_len(length(pg))) {
 
-    # Add titles
-    if (!is.null(titles) & i == 1) {
-      tbl <- titles(tbl, titles)
-    }
+      brk <- FALSE
+      if (pages > 1 & i == length(pg))
+        brk <- TRUE
 
-    #browser()
-    # Add spanning headers if requested
-    # spns <- attr(dt, "spans")
-    # if (!is.null(spns)) {
-    #
-    #   for (i in seq_len(length(spns))) {
-    #     spn <- spns[[i]]
-    #     tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
-    #                            to = as.character(spn$end), level = spn$level,
-    #                            standard_eval = TRUE)
-    #
-    #   }
-    #
-    # }
+      # Assign page data
+      dt <- pg[[i]]
 
-    # Append table to report
-    rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
+      if ("data.frame" %in% class(dt)) {
+        if (viewer == TRUE) {
+
+          if ("CAT" %in% names(dt)) {
+            lbl <-  attr(dt$CAT, "label")
+            if (is.null(lbl))
+              lbl <- "CAT"
+            nms <- names(dt)
+            names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
+          }
+
+          if ("stub" %in% names(dt)) {
+           lbl <- attr(dt$stub, "label")
+           if (is.null(lbl))
+             lbl <- ""
+
+          }
+
+          # Create table
+          tbl <- create_table(dt, borders = c("all"))
+
+          # Dedupe stub column if it exists
+          if ("stub" %in% names(dt)) {
+
+            wth <- rpt$char_width * nchar(lbl)
+            tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
+                          standard_eval = "true")
+
+          }
+
+        } else {
+
+          # Create table
+          tbl <- create_table(dt, borders = c("outside"))
+        }
+
+        # Add titles
+        tt <- NULL
+        if (i == 1) {
+
+          if (!is.null(titles))
+            tt <- titles
+
+        }
+
+        if (!is.null(attr(dt, "ttls")))
+          tt <- c(tt, attr(dt, "ttls"))
+
+        if (!is.null(tt))
+          tbl <- titles(tbl, tt)
+
+        #browser()
+        # Add spanning headers if requested
+        # spns <- attr(dt, "spans")
+        # if (!is.null(spns)) {
+        #
+        #   for (i in seq_len(length(spns))) {
+        #     spn <- spns[[i]]
+        #     tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
+        #                            to = as.character(spn$end), level = spn$level,
+        #                            standard_eval = TRUE)
+        #
+        #   }
+        #
+        # }
+
+        # Append table to report
+        rpt <- add_content(rpt, tbl, align = 'center', page_break = brk)
 
 
-  }
+
+      } else if ("ggplot" %in% class(dt)) {
+
+        if (viewer == TRUE) {
+
+          # Create plot content
+          fig <- create_plot(dt, height = 3, width = 3.5)
+
+        } else {
+
+          # Create plot content
+          fig <- create_plot(dt, height = 4, width = 5)
+
+
+        }
+
+        # Add plot content
+        rpt <- add_content(rpt, fig, align = 'center', page_break = brk)
+
+
+      }
+    } # Tables
+
+
+  } # Pages
 
 
   ret <- c()
@@ -677,3 +726,210 @@ get_class_names <- function(class) {
 
 
 
+
+# Perform the set operation.  Works on main
+# dataset plus one or more datasets.
+perform_set <- function(dta, stdta) {
+
+  # Save off class
+  dtacls <- class(dta)
+
+  # Work with pure data frames.
+  # Tibbles will mess with names.
+  dta <- as.data.frame(dta)
+
+  # Put in list
+  if ("data.frame" %in% class(stdta))
+    dtalst <- list(stdta)
+  else
+    dtalst <- stdta
+
+  # Collect Names
+  fnms <- names(dta)
+
+  # Assign counter to ensure stacking
+  dta[["..ds"]] <- 0
+
+  ret <- dta
+
+  # Stack datasets
+  for (i in seq_len(length(dtalst))){
+
+    tmp <- as.data.frame(dtalst[[i]])
+    nnms <- names(tmp)
+    fnms <- c(fnms, nnms[!nnms %in% fnms])
+    tmp[["..ds"]] <- i
+    ret <- merge(ret, tmp, all = TRUE, sort = FALSE)
+
+  }
+
+  # Clean up counter
+  ret[["..ds"]] <- NULL
+  dta[["..ds"]] <- NULL
+
+  # Rename so first dataset drives naming
+  # Can easily break if name has been changed.
+  ret <- tryCatch({ret[ , fnms]}, error = function(cond){ret})
+
+  # Restore attributes
+  ret <- copy_attributes_sp(dta, ret)
+  ret <- copy_df_attributes(dta, ret)
+
+  # Restore original class
+  class(ret) <- dtacls
+
+  return(ret)
+
+}
+
+copy_attributes_sp <- function(df1, df2) {
+
+  ret <- df2
+
+  for (nm in names(df2)) {
+
+    col <- df1[[nm]]
+    if (!is.null(col)) {
+      for (at in names(attributes(col))) {
+
+        if (!at %in% c("levels")) {
+
+          attr(ret[[nm]], at) <- attr(col, at)
+        }
+
+      }
+    }
+
+  }
+
+  return(ret)
+}
+
+
+# Copies attributes on data frame from one df to another
+# Skips rownames and names, which can cause trouble.
+copy_df_attributes <- function(src, trgt) {
+
+  atts <- attributes(src)
+
+  ret <- trgt
+
+  for (anm in names(atts)) {
+
+    if (!anm %in% c("names", "row.names")) {
+      attr(ret, anm) <- atts[[anm]]
+    }
+  }
+
+  return(ret)
+}
+
+
+get_ttest_type <- function(txt) {
+
+  ret <- txt
+  if (length(grep(":", txt, fixed = TRUE)) > 0) {
+
+    pos <- unlist(gregexpr(':', txt, fixed = TRUE))[1]
+    ret <- substring(txt, pos + 1)
+
+  }
+
+
+  return(ret)
+
+}
+
+
+# Function to split the paired parameter string and create
+# separate variables for VAR1, VAR2, and DIFF
+add_paired_vars <- function(dt, vlbl, shape) {
+
+  if (is.null(vlbl)) {
+
+    ret <- dt
+
+  } else {
+
+    if (shape %in% c("wide", "stacked")) {
+      nms <- names(dt)
+      slbl <- strsplit(vlbl, "-", fixed = TRUE)
+      pos <- match("VAR", nms)
+      ret <- dt
+
+      ret[["LBL"]] <- as.integer(sub("..diff", "", ret[["VAR"]], fixed = TRUE))
+      ret[["DIFF"]] <- ret[["VAR"]]
+      for (i in seq_len(nrow(ret))) {
+        lbl <- ret[["LBL"]][i]
+        ret[["VAR1"]][i] <- trimws(slbl[[lbl]][1])
+        ret[["VAR2"]][i] <- trimws(slbl[[lbl]][2])
+      }
+      ret[["VAR"]] <- NULL
+      ret[["LBL"]] <- NULL
+
+      # Rearrange df
+      prenms <- c()
+      if (pos > 1)
+        prenms <- nms[seq(1, pos - 1)]
+
+      postnms <- nms[seq(pos + 1, length(nms))]
+
+      nmv <- c(prenms, "VAR1", "VAR2", "DIFF", postnms)
+      ret <- ret[ , nmv]
+
+    } else if (shape == "long") {
+
+      nms <- names(dt)
+      rnms <- sub("..diff", "DIFF", nms, fixed = TRUE)
+      ret <- dt
+      names(ret) <- rnms
+
+
+    } else {
+
+      ret <- dt
+    }
+
+  }
+
+
+  return(ret)
+
+}
+
+# A function to replace temporary variable names with real ones
+fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
+
+  ret <- dat
+  if (!is.null(varnms) & !is.null(varlbls)) {
+
+    lkp <- varlbls
+    names(lkp) <- varnms
+
+    if (shp == "long" & dnam == "TTests") {
+
+      nms <- names(dat)
+      nnms <- c()
+
+      for (i in seq_len(length(nms))) {
+
+        if (nms[i] %in% names(lkp)) {
+          nnms[i] <- lkp[nms[i]]
+        } else {
+          nnms[i] <- nms[i]
+        }
+      }
+
+      names(ret) <- nnms
+
+    } else if (shp == "stacked" & dnam == "TTests") {
+
+      nms <- names(dat)
+      if ("VAR" %in% nms) {
+        ret[["VAR"]] <- lkp[ret[["VAR"]]]
+      }
+    }
+  }
+
+  return(ret)
+}

@@ -1615,10 +1615,9 @@ test_that("freq55: get_nlevels works as expected.", {
 
 test_that("freq56: nlevels works as expected.", {
 
-  res <- proc_freq(dat, tables = Eyes,
-                   output = report,
-                   options = nlevels)
-
+  res <- proc_freq(dat, tables = "Eyes",
+                   output = "report",
+                   options = "nlevels")
 
   res
 
@@ -1627,9 +1626,9 @@ test_that("freq56: nlevels works as expected.", {
   expect_equal(nrow(res[[1]]), 1)
 
 
-  res <- proc_freq(dat, tables = v(Eyes, Hair),
-                   output = report,
-                   options = nlevels)
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   output = "report",
+                   options = "nlevels")
 
 
   res
@@ -2066,4 +2065,29 @@ test_that("freq69: Param checks work.", {
 
 
 })
+
+test_that("freq70: Param checks work.", {
+
+
+tst <- read.table(header = TRUE, text = '
+var1 var2 var3
+1    20     NA
+2    NA     NA
+3    40     NA
+')
+
+tst$var1
+tst$var2
+tst$var3
+
+
+res <- proc_freq(tst, tables = v(var1, var2, var3), options = nlevels)
+
+res
+
+expect_equal(is.null(res), FALSE)
+expect_equal(as.numeric(res$`NLevels:var3`$VAR), 0)
+
+})
+
 

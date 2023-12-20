@@ -27,6 +27,7 @@ The package includes the following functions:
 
 * `proc_freq()`: A function to simulate the FREQ procedure.
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
+* `proc_ttest()`: A function to perform T-Tests and calculate confidence limits. 
 * `proc_transpose()`: A function to pivot data similar in syntax to the 
 TRANSPOSE procedure.
 * `proc_sort()`: A function to sort and dedupe datasets.
@@ -180,6 +181,64 @@ is somewhat different from SAS®, but makes it easier to manipulate
 the output data.
 
 
+
+### Hypothesis Testing
+
+Similar to PROC TTEST in SAS®, the `proc_ttest()` function performs 
+hypothesis testing and calculates confidence limits.  The function can operate
+on a single variable, two independent samples, or paired observations.  
+
+The paired observation test can be used in cases when you have samples on the 
+same measure at different time points, or before and after a procedure. This example
+attempts to determine whether there is a significant change in systolic blood
+pressure before and after a stimulus.  It uses the following data:
+```{r eval=FALSE, echo=TRUE} 
+# Create sample data
+pressure <- read.table(header = TRUE, text = '
+  SBPbefore SBPafter
+  120 128
+  124 131
+  130 131
+  118 127
+  140 132
+  128 125
+  140 141
+  135 137
+  126 118
+  130 132
+  126 129
+  127 135
+  ')
+
+```
+
+Now let's determine if there is a significant change before and after the stimulus:
+```{r eval=FALSE, echo=TRUE} 
+# Perform T-Test
+res <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+
+# View results
+res
+# $Statistics
+#                  VAR  N      MEAN      STD   STDERR MIN MAX
+# 1 SBPbefore-SBPafter 12 -1.833333 5.828353 1.682501  -9   8
+# 
+# $ConfLimits
+#                  VAR      MEAN      LCLM     UCLM      STD
+# 1 SBPbefore-SBPafter -1.833333 -5.536492 1.869825 5.828353
+# 
+# $TTests
+#                  VAR DF         T     PROBT
+# 1 SBPbefore-SBPafter 11 -1.089648 0.2991635
+
+```
+If printing is enabled, the following is sent to the viewer:
+
+<img src="../man/images/ttest.png"/>
+
+The above test shows although there was a change before and after the stimulus, 
+that change was not statistically significant.
+
 ### Other Functions
 
 While the main focus of the **procs** package is on statistical
@@ -188,7 +247,7 @@ produce a more desirable result. Some additional functions have been added
 to the **procs** package that SAS® programmers will be familiar with:
 `proc_transpose()`, `proc_sort()`, and `proc_print()`.
 
-Continuing from the example above, let's take some additional steps
+Continuing from the means example above, let's take some additional steps
 to produce a little report:
 
 ```{r eval=FALSE, echo=TRUE} 
@@ -272,6 +331,7 @@ Those articles include:
 
 * [The Frequency Function](procs-freq.html)
 * [The Means Function](procs-means.html)
+* [The T-Test Function](procs-ttest.html)
 * [Data Manipulation Functions](procs-dm.html)
 * [Example 1: Demographics](procs-example1.html)
 * [Example 2: Adverse Events](procs-example2.html)

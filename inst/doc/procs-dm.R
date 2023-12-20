@@ -355,3 +355,79 @@ knitr::opts_chunk$set(
 #  # 3  1 David    74
 #  # 4  1 David    45
 
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Create input data
+#  dat <- read.table(header = TRUE, text = '
+#                    Name    Subject   Semester1  Semester2
+#                    Samma	  Maths	    96             94
+#                    Sandy	  English	  76             51
+#                    Devesh	German	  76             95
+#                    Rakesh	Maths	    50             63
+#                    Priya	  English	  62             80
+#                    Kranti	Maths	    92             92
+#                    William	German	  87             75')
+#  
+#  # View data
+#  dat
+#  #      Name Subject Semester1 Semester2
+#  # 1   Samma   Maths        96        94
+#  # 2   Sandy English        76        51
+#  # 3  Devesh  German        76        95
+#  # 4  Rakesh   Maths        50        63
+#  # 5   Priya English        62        80
+#  # 6  Kranti   Maths        92        92
+#  # 7 William  German        87        75
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Create factor with ordered levels
+#  dat$Subject <- factor(dat$Subject, levels = c("Maths", "English", "German"))
+#  
+#  # View attributes
+#  attributes(dat$Subject)
+#  # $levels
+#  # [1] "Maths"   "English" "German"
+#  #
+#  # $class
+#  # [1] "factor"
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Sort by factor variable
+#  dat2 <- proc_sort(dat, by = Subject)
+#  
+#  # View result
+#  dat2
+#  #      Name Subject Semester1 Semester2
+#  # 1   Samma   Maths        96        94
+#  # 4  Rakesh   Maths        50        63
+#  # 6  Kranti   Maths        92        92
+#  # 2   Sandy English        76        51
+#  # 5   Priya English        62        80
+#  # 3  Devesh  German        76        95
+#  # 7 William  German        87        75
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  class(dat2$Subject)
+#  # [1] "factor"
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Sort by factor variable
+#  dat2 <- proc_sort(dat, by = Subject, as.character = TRUE)
+#  
+#  # Same results
+#  dat2
+#  #      Name Subject Semester1 Semester2
+#  # 1   Samma   Maths        96        94
+#  # 4  Rakesh   Maths        50        63
+#  # 6  Kranti   Maths        92        92
+#  # 2   Sandy English        76        51
+#  # 5   Priya English        62        80
+#  # 3  Devesh  German        76        95
+#  # 7 William  German        87        75
+#  
+#  # But now Subject is a character
+#  class(dat2$Subject)
+#  # [1] "character"
+

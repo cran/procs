@@ -95,6 +95,44 @@ knitr::opts_chunk$set(
 #  # 10   Male   Red    1    4 Freq  4  8.5000  1.732051   7  10
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Create sample data
+#  pressure <- read.table(header = TRUE, text = '
+#    SBPbefore SBPafter
+#    120 128
+#    124 131
+#    130 131
+#    118 127
+#    140 132
+#    128 125
+#    140 141
+#    135 137
+#    126 118
+#    130 132
+#    126 129
+#    127 135
+#    ')
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Perform T-Test
+#  res <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+#  
+#  # View results
+#  res
+#  # $Statistics
+#  #                  VAR  N      MEAN      STD   STDERR MIN MAX
+#  # 1 SBPbefore-SBPafter 12 -1.833333 5.828353 1.682501  -9   8
+#  #
+#  # $ConfLimits
+#  #                  VAR      MEAN      LCLM     UCLM      STD
+#  # 1 SBPbefore-SBPafter -1.833333 -5.536492 1.869825 5.828353
+#  #
+#  # $TTests
+#  #                  VAR DF         T     PROBT
+#  # 1 SBPbefore-SBPafter 11 -1.089648 0.2991635
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  library(fmtr)
 #  
 #  # Filter and select using subset function

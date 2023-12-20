@@ -119,7 +119,7 @@
 #' dataset.
 #' }
 #' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
-#' default, the function return all TYPE combinations.
+#' default, the function returns all TYPE combinations.
 #' }
 #' }
 #' @section TYPE and FREQ Variables:
@@ -206,14 +206,13 @@
 #' The "report" keyword returns the datasets from the interactive report, which
 #' may be different from the standard output. The output parameter also accepts
 #' data shaping keywords "long, "stacked", and "wide".
-#' The keywords are
-#' shaping options that control the structure of the output data. See the
+#' The shaping keywords control the structure of the output data. See the
 #' \strong{Data Shaping} section for additional details. Note that
 #' multiple output keywords may be passed on a
 #' character vector. For example,
 #' to produce both a report dataset and a "long" output dataset,
 #' use the parameter \code{output = c("report", "out", "long")}.
-#' @param by An optional by group. If you specify an by group, the input
+#' @param by An optional by group. If you specify a by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
 #' @param class The \code{class} parameter is similar to the \code{by}
@@ -223,12 +222,12 @@
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
+#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
 #' The "notype", "nofreq", and "nonobs" keywords will turn
 #' off columns on the output datasets.  The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 #' The "maxdec = " option sets the maximum number of decimal places displayed
-#' on report output.
+#' on report output. The "nway" option returns only the highest type values.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -879,6 +878,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           }
         }
 
+        if (st == "clmstd") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_clmstd(var, narm, alph)
+
+          rw[["LCLMSTD"]] <- tmp[["lcl"]]
+
+          rw[["UCLMSTD"]] <- tmp[["ucl"]]
+
+
+        }
+
         if (st == "t") {
 
           alph <- get_alpha(opts)
@@ -1111,7 +1123,9 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               P40 = "40th Pctl", P50 = "50th Pctl", P60 = "60th Pctl",
               P70 = "70th Pctl", P75 = "75th Pctl", P80 = "80th Pctl",
               P90 = "90th Pctl", P95 = "95th Pctl", P99 = "99th Pctl",
-              Q1 = "Lower Quartile", Q3 = "Upper Quartile"
+              Q1 = "Lower Quartile", Q3 = "Upper Quartile",
+              UCLMSTD = "Upper %s%% CL for Std Dev",
+              LCLMSTD = "Lower %s%% CL for Std Dev"
               )
 
 #' @import common
@@ -1132,6 +1146,8 @@ gen_report_means <- function(data,
   alph <- (1 - get_alpha(opts)) * 100
   mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
   mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
+  mlbls[["UCLMSTD"]] <- sprintf(mlbls[["UCLMSTD"]], alph)
+  mlbls[["LCLMSTD"]] <- sprintf(mlbls[["LCLMSTD"]], alph)
 
   #browser()
 
@@ -1597,7 +1613,8 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
     if ("STAT" %in% names(res)) {
         # Sort stats by supplied order
-        res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))
+        # res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))  # stats not complete list
+        res[["STAT"]] <- factor(res[["STAT"]], levels = unique(res[["STAT"]]))
 
         # Deal with NA values in sort
         ccnms <- as.character(clsnms)

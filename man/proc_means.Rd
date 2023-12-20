@@ -46,15 +46,14 @@ option will return a NULL instead of a dataset or list of datasets.
 The "report" keyword returns the datasets from the interactive report, which
 may be different from the standard output. The output parameter also accepts
 data shaping keywords "long, "stacked", and "wide".
-The keywords are
-shaping options that control the structure of the output data. See the
+The shaping keywords control the structure of the output data. See the
 \strong{Data Shaping} section for additional details. Note that
 multiple output keywords may be passed on a
 character vector. For example,
 to produce both a report dataset and a "long" output dataset,
 use the parameter \code{output = c("report", "out", "long")}.}
 
-\item{by}{An optional by group. If you specify an by group, the input
+\item{by}{An optional by group. If you specify a by group, the input
 data will be subset on the by variable(s) prior to performing any
 statistics.}
 
@@ -65,12 +64,12 @@ When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
+"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
 The "notype", "nofreq", and "nonobs" keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
-on report output.}
+on report output. The "nway" option returns only the highest type values.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -206,7 +205,7 @@ option will inhibit printing.
 dataset.
 }
 \item{\strong{nway}: Returns only the highest level TYPE combination.  By
-default, the function return all TYPE combinations.
+default, the function returns all TYPE combinations.
 }
 }
 }
