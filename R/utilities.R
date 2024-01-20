@@ -684,9 +684,16 @@ restore_datatypes <- function(res, data, class, clsnms = NULL) {
         res[[clsnms[k]]] <- NA
 
       } else {
-        if (all(class(data[[class[k]]]) == "factor")) {
+        if (any(class(data[[class[k]]]) == "factor")) {
 
-          res[[clsnms[k]]] <- factor(res[[clsnms[k]]], levels = attr(data[[class[k]]], "levels"))
+          if (any(class(data[[class[k]]]) == "ordered")) {
+            res[[clsnms[k]]] <- factor(res[[clsnms[k]]],
+                                       levels = attr(data[[class[k]]], "levels"),
+                                       ordered = TRUE)
+          } else {
+            res[[clsnms[k]]] <- factor(res[[clsnms[k]]],
+                                       levels = attr(data[[class[k]]], "levels"))
+          }
 
         } else if (all(class(data[[class[k]]]) == "Date")) {
 
@@ -929,6 +936,28 @@ fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
         ret[["VAR"]] <- lkp[ret[["VAR"]]]
       }
     }
+  }
+
+  return(ret)
+}
+
+
+# Pass a vector of strings and get back a list of formulas
+get_formulas <- function(models) {
+
+  ret <- list()
+
+  for (ml in models) {
+
+    s1 <- trimws(strsplit(ml, "=", fixed = TRUE)[[1]])
+
+    dv <- s1[1]
+
+    s2 <- trimws(strsplit(s1[2], " ", fixed = TRUE)[[1]])
+
+    iv <- paste(s2, collapse = "+")
+
+    ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
   }
 
   return(ret)

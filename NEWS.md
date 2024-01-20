@@ -1,3 +1,10 @@
+# procs 1.0.5
+
+* Fixed bug on `proc_means()` when ordered factor used as class.
+* Fixed bug on `proc_transpose()` when ordered factor used on by parameter.
+* Fixed bug on `proc_freq()` when factor used with 'missing' option.
+* Updates to documentation.
+
 # procs 1.0.4
 
 * Added "as.character" parameter to `proc_sort()` to cast any factors in the
