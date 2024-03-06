@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>The <code>proc_freq</code> function simulates a SAS® PROC FREQ
+<p>The <code>proc_freq()</code> function simulates a SAS® PROC FREQ
 procedure. Below is a short tutorial on the function. Like PROC FREQ,
 the function is both an interactive function and returns datasets.</p>
 <div id="create-sample-data" class="section level2">
@@ -373,7 +373,7 @@ the function is both an interactive function and returns datasets.</p>
 <div id="get-frequencies" class="section level2">
 <h2>Get Frequencies</h2>
 <p>Now that we have some data, let’s send that data to the
-<code>proc_freq</code> function to see the frequency distribution.</p>
+<code>proc_freq()</code> function to see the frequency distribution.</p>
 <p>The <code>options()</code> statement below turns off printing of all
 <strong>procs</strong> functions. This statement is necessary so that
 the sample code below can pass CRAN checks. When running sample code
@@ -393,7 +393,7 @@ percent shown for each frequency count.</p>
 <div id="control-columns" class="section level2">
 <h2>Control Columns</h2>
 <p>The <code>options</code> parameter can control many aspects of the
-<code>proc_freq</code> function. For example, if you did not want the
+<code>proc_freq()</code> function. For example, if you did not want the
 cumulative frequency and percent, you could turn off these columns with
 the option “nocum”.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Turn off cumulative columns</span></span>
@@ -434,7 +434,7 @@ cross-tabulation table:</p>
 <h2>Multiple Tables</h2>
 <p>The <code>tables</code> parameter accepts more than one table
 request. To request multiple tables, pass a quoted or unquoted vector.
-Note that <code>proc_freq</code> does not accept grouping syntax, such
+Note that <code>proc_freq()</code> does not accept grouping syntax, such
 as that allowed by SAS®. You must specify each cross-tab
 individually:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Request two crosstabs</span></span>
@@ -453,8 +453,9 @@ values in a categorical variable:</p>
 <div id="weighted-frequencies" class="section level2">
 <h2>Weighted Frequencies</h2>
 <p>The <code>weight</code> parameter is used to achieve weighted
-frequencies. When a weight is specified, <code>proc_freq</code> will use
-the counts in the indicated variable for all frequency calculations.</p>
+frequencies. When a weight is specified, <code>proc_freq()</code> will
+use the counts in the indicated variable for all frequency
+calculations.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Add weight variable</span></span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, <span class="at">weight =</span> z)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /></p>
@@ -490,7 +491,7 @@ of association. Here is an example of the Chi-Square test:</p>
 </div>
 <div id="output-datasets" class="section level2">
 <h2>Output Datasets</h2>
-<p>You may control datasets returned from the <code>proc_freq</code>
+<p>You may control datasets returned from the <code>proc_freq()</code>
 function using the <code>output</code> parameter. This parameter takes
 three basic values: “out”, “report”, and “none”. The “out” keyword
 requests datasets meant for output, and is the default. These datasets
@@ -536,14 +537,14 @@ table request.</p>
 <span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="dv">11</span>    y    x    C    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
 <span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
 <p>Notice that the way output datasets are requested from the
-<code>proc_freq</code> function is much simpler than the corresponding
-mechanism in SAS®. With <code>proc_freq</code>, by default, all
+<code>proc_freq()</code> function is much simpler than the corresponding
+mechanism in SAS®. With <code>proc_freq()</code>, by default, all
 requested tables and statistics will be returned in a list. No other
 output parameters are needed.</p>
 </div>
 <div id="data-shaping" class="section level2">
 <h2>Data Shaping</h2>
-<p>The <code>proc_freq</code> function provides three options for
+<p>The <code>proc_freq()</code> function provides three options for
 shaping data: “wide”, “long”, and “stacked”. These options control how
 the output data is organized. The options are also passed on the
 <code>output</code> parameter. The shaping options are best illustrated

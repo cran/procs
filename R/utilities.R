@@ -946,6 +946,9 @@ fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
 get_formulas <- function(models) {
 
   ret <- list()
+  nms <- names(models)
+
+  cnt <- 1
 
   for (ml in models) {
 
@@ -957,8 +960,92 @@ get_formulas <- function(models) {
 
     iv <- paste(s2, collapse = "+")
 
-    ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
+    if (length(nms) > 0 && !is.na(nms[cnt]) && nms[cnt] != "")
+      ret[[nms[cnt]]] <- formula(paste(dv, "~", iv))
+    else
+      ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
+
+    cnt <- cnt + 1
   }
 
   return(ret)
+}
+
+
+get_obs <- function(data, formula) {
+
+  vrs <- get_vars(formula)
+
+  tvrs <- c(vrs$dvar, vrs$ivar)
+
+
+  naobs <- is.na(data[[tvrs[1]]])
+
+  for (i in seq_len(length(tvrs) - 1)) {
+
+    v2 <- is.na(data[[tvrs[i + 1]]])
+
+    naobs <- naobs | v2
+  }
+
+  tobs <- nrow(data)
+  mobs <- sum(naobs)
+  uobs <- tobs - mobs
+
+  lbls <- c("Number of Observations Read",
+            "Number of Observations Used",
+            "Number of Observations with Missing Values")
+
+  if (mobs > 0) {
+    obs <- c(tobs, uobs, mobs)
+
+  } else {
+
+    obs <- c(tobs, uobs)
+    lbls <- lbls[1:2]
+  }
+
+  ret <- data.frame(stub = lbls, NOBS = obs)
+
+}
+
+
+get_vars <- function(formula) {
+
+  cf <- as.character(formula)
+
+  dvar <- cf[2]
+
+  ivar <- trimws(strsplit(cf[3], "+", fixed = TRUE)[[1]])
+
+  ret <- list(dvar = dvar, ivar = ivar)
+
+  return(ret)
+}
+
+
+get_valid_obs <- function(data, formula) {
+
+  vrs <- get_vars(formula)
+
+  tvrs <- c(vrs$dvar, vrs$ivar)
+
+  naobs <- !is.na(data[[tvrs[1]]])
+
+  for (i in seq_len(length(tvrs) - 1)) {
+
+    v2 <- !is.na(data[[tvrs[i + 1]]])
+
+    naobs <- naobs & v2
+  }
+
+  if (nrow(data) > 0)
+    ret <- data[naobs, ]
+  else
+    ret <- data
+
+
+
+  return(ret)
+
 }

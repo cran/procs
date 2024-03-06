@@ -973,6 +973,8 @@ test_that("ttest23: shape_ttest_data works as expected.", {
 test_that("ttest24: test parameter checks.", {
 
 
+  expect_error(proc_ttest("fork", var = "Height"))
+  expect_error(proc_ttest(cls[0, ], var = "Height"))
   expect_error(proc_ttest(cls, var = "fork"))
   expect_error(proc_ttest(cls, var = "Height", options = "bork"))
   expect_error(proc_ttest(cls, var = "Height", options = c("bork"= 2)))
@@ -1173,6 +1175,16 @@ test_that("ttest27: Check F Values for different var and class combinations.", {
 
 })
 
+
+
+test_that("ttest28: Data with no rows generates error.", {
+
+  cls2 <- cls[0, ]
+
+  expect_error(proc_ttest(cls2, var = c("Height")))
+
+
+})
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
 # test_that("ttest28: Paired ttest with lognormal data works.", {

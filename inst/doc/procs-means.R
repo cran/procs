@@ -60,7 +60,7 @@ knitr::opts_chunk$set(
 #  # 2   z     65 506 57.5 75.5
 #  
 #  
-#  # Output dataset using "all" option
+#  # Output dataset using "out" option
 #  res2 <- proc_means(dat,
 #                     stats = v(median, sum, q1, q3),
 #                     output = out)

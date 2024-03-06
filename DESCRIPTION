@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
 Title: Recreates Some 'SAS®' Procedures in 'R'
-Version: 1.0.5
+Version: 1.0.6
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
@@ -28,7 +28,7 @@ Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
     'SAS®' procedures.  Specifically, the package aims to 
     simulate the functionality of 'proc freq', 'proc means', 'proc ttest',
-    'proc transpose', 'proc sort', and 'proc print'. 
+    'proc reg', 'proc transpose', 'proc sort', and 'proc print'. 
     The simulation will include recreating 
     all statistics with the highest fidelity possible. 
 License: CC0
@@ -39,14 +39,14 @@ Depends: R (>= 3.6.0), common
 Suggests: knitr, rmarkdown, testthat (>= 3.0.0), covr, logr
 Imports: utils, fmtr, reporter, stats, tibble, sasLM (>= 0.9.9)
 VignetteBuilder: knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2024-01-20 05:50:57 UTC; dbosa
+Packaged: 2024-03-06 14:58:45 UTC; dbosa
 Author: David Bosak [aut, cre],
   Kevin Kramer [ctb],
   Brian Varney [ctb],
   Duong Tran [ctb],
   Yifei Chen [ctb]
 Repository: CRAN
-Date/Publication: 2024-01-20 06:20:02 UTC
+Date/Publication: 2024-03-06 15:30:02 UTC
