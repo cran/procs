@@ -7,7 +7,6 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  library(sassy)
-#  library(procs)
 #  
 #  # Prepare Log -------------------------------------------------------------
 #  
@@ -34,19 +33,22 @@ knitr::opts_chunk$set(
 #                  condition(x >=30 & x <= 39, "30 to 39"),
 #                  condition(x >=40 & x <=49, "40 to 49"),
 #                  condition(x >= 50, ">= 50"),
-#                  condition(TRUE, "Out of range"))
+#                  condition(TRUE, "Out of range"),
+#                  as.factor = TRUE)
 #  
 #  put("Sex decodes")
 #  fmt_sex <- value(condition(is.na(x), "Missing"),
 #                   condition(x == "M", "Male"),
 #                   condition(x == "F", "Female"),
-#                   condition(TRUE, "Other"))
+#                   condition(TRUE, "Other"),
+#                   as.factor = TRUE)
 #  
 #  put("Race decodes")
 #  fmt_race <- value(condition(is.na(x), "Missing"),
 #                    condition(x == "WHITE", "White"),
 #                    condition(x == "BLACK", "Black or African American"),
-#                    condition(TRUE, "Other"))
+#                    condition(TRUE, "Other"),
+#                    as.factor = TRUE)
 #  
 #  
 #  put("Compile format catalog")
@@ -56,11 +58,7 @@ knitr::opts_chunk$set(
 #             CNT = "%2d", PCT = "(%5.1f%%)",
 #             AGECAT = agecat,
 #             SEX = fmt_sex,
-#             RACE = fmt_race,
-#             AOV.F = "%5.3f",
-#             AOV.P = "(%5.3f)",
-#             CHISQ = "%5.3f",
-#             CHISQ.P = "(%5.3f)")
+#             RACE = fmt_race)
 #  
 #  
 #  # Load and Prepare Data ---------------------------------------------------
@@ -129,6 +127,7 @@ knitr::opts_chunk$set(
 #                 copy = VAR, id = BY,
 #                 name = LABEL) -> age_trans
 #  
+#  
 #  put("Calculate aov")
 #  age_aov <- aov(AGE ~ ARM, data = adsl) |>
 #    summary()
@@ -150,6 +149,7 @@ knitr::opts_chunk$set(
 #  
 #  put("Append aov")
 #  datastep(age_trans, merge = age_aov_comb, {}) -> age_block
+#  
 #  
 #  # Sex Block ---------------------------------------------------------------
 #  
@@ -182,12 +182,12 @@ knitr::opts_chunk$set(
 #           {
 #  
 #             LABEL <- fapply(LABEL, fc$SEX)
-#             LABEL <- factor(LABEL, levels = levels(fc$SEX))
 #  
 #           }) -> sex_cnts
 #  
 #  put("Sort by label")
 #  proc_sort(sex_cnts, by = LABEL) -> sex_cnts
+#  
 #  
 #  put("Get sex chisq")
 #  proc_freq(adsl, tables = v(SEX * ARM),
@@ -199,7 +199,7 @@ knitr::opts_chunk$set(
 #           keep = PVALUE,
 #           {
 #  
-#             PVALUE = fapply2(CHISQ, CHISQ.P)
+#             PVALUE = fapply2(VAL, PROB)
 #           }) -> sex_chisq_comb
 #  
 #  put("Append chisq")
@@ -245,7 +245,7 @@ knitr::opts_chunk$set(
 #           }) -> race_cnts
 #  
 #  put("Sort by label")
-#  proc_sort(race_cnts, by = LABEL) -> race_cnts
+#  proc_sort(race_cnts, by = LABEL) -> race_block
 #  
 #  put("Get race chisq")
 #  proc_freq(adsl, tables = RACE * ARM,
@@ -262,7 +262,6 @@ knitr::opts_chunk$set(
 #  
 #  put("Append chisq")
 #  datastep(race_cnts, merge = race_chisq_comb, {}) -> race_block
-#  
 #  
 #  # Age Group Block ----------------------------------------------------------
 #  
@@ -298,7 +297,7 @@ knitr::opts_chunk$set(
 #  put("Some clean up")
 #  datastep(ageg_trans,
 #           drop = NAME,
-#           {}) -> ageg_cnts
+#           {}) -> ageg_block
 #  
 #  put("Get ageg chisq")
 #  proc_freq(adsl, tables = AGECAT * ARM,
@@ -309,13 +308,12 @@ knitr::opts_chunk$set(
 #           format = fc,
 #           keep = c("PVALUE"),
 #           {
-#             PVALUE = fapply2(CHISQ, CHISQ.P)
+#             PVALUE = fapply2(VAL, PROB)
 #           }) -> ageg_chisq_comb
 #  
 #  put("Append chisq")
 #  datastep(ageg_cnts, merge = ageg_chisq_comb,
 #           {}) -> ageg_block
-#  
 #  
 #  put("Combine blocks into final data frame")
 #  datastep(age_block,
@@ -323,7 +321,6 @@ knitr::opts_chunk$set(
 #           {}) -> final
 #  
 #  # Report ------------------------------------------------------------------
-#  
 #  
 #  sep("Create and print report")
 #  
@@ -373,5 +370,6 @@ knitr::opts_chunk$set(
 #  
 #  # Uncomment to view log
 #  # file.show(lf)
+#  
 #  
 

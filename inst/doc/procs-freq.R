@@ -96,8 +96,9 @@ knitr::opts_chunk$set(
 #  # 12    y    x    C    6 8   0  0.0
 #  #
 #  # $`chisq:y * x`
-#  #      CHISQ CHISQ.DF   CHISQ.P
-#  # 1 6.444444        6 0.3752853
+#  #                         STAT DF      VAL      PROB
+#  # 1                 Chi-Square  6 6.444444 0.3752853
+#  # 2 Continuity Adj. Chi-Square  6 6.444444 0.3752853
 #  
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------

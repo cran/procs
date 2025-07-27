@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -64,10 +64,9 @@ knitr::opts_chunk$set(
 #  # 18 Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
 #  #
 #  # $Chisq
-#  #      Measure        Value
-#  # 1 Chi-Square 1.382898e+02
-#  # 2         DF 9.000000e+00
-#  # 3   PR>ChiSq 2.325287e-25
+#  #                         STAT DF      VAL         PROB
+#  # 1                 Chi-Square  9 138.2898 2.325287e-25
+#  # 2 Continuity Adj. Chi-Square  9 138.2898 2.325287e-25
 #  
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
@@ -115,10 +114,10 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  # Perform T-Test
-#  res <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+#  res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
 #  
 #  # View results
-#  res
+#  res3
 #  # $Statistics
 #  #                  VAR  N      MEAN      STD   STDERR MIN MAX
 #  # 1 SBPbefore-SBPafter 12 -1.833333 5.828353 1.682501  -9   8
@@ -136,13 +135,13 @@ knitr::opts_chunk$set(
 #  library(fmtr)
 #  
 #  # Filter and select using subset function
-#  res3 <- subset(res2, TYPE != 0, c(BY, CLASS, N, MEAN, STD, MIN, MAX))
+#  res4 <- subset(res2, TYPE != 0, c(BY, CLASS, N, MEAN, STD, MIN, MAX))
 #  
 #  # Transpose statistics
-#  res4 <- proc_transpose(res3, id = CLASS, by = BY, name = Statistic)
+#  res5 <- proc_transpose(res3, id = CLASS, by = BY, name = Statistic)
 #  
 #  # View transformed data
-#  res4
+#  res5
 #  #        BY Statistic    Black    Blond    Brown       Red
 #  # 1  Female         N  4.00000  4.00000  4.00000  4.000000
 #  # 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000
@@ -156,10 +155,10 @@ knitr::opts_chunk$set(
 #  # 10   Male       MAX 32.00000 30.00000 53.00000 10.000000
 #  
 #  # Assign factor to BY so we can sort
-#  res4$BY <- factor(res4$BY, levels = c("Male", "Female"))
+#  res5$BY <- factor(res5$BY, levels = c("Male", "Female"))
 #  
 #  # Sort male to top
-#  res5 <- proc_sort(res4, by = BY)
+#  res6 <- proc_sort(res5, by = BY)
 #  #        BY Statistic    Black    Blond    Brown       Red
 #  # 6    Male         N  4.00000  4.00000  4.00000  4.000000
 #  # 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000
@@ -173,27 +172,27 @@ knitr::opts_chunk$set(
 #  # 5  Female       MAX 36.00000 64.00000 66.00000 16.000000
 #  
 #  # Create formatting list
-#  fmt <- flist(STD = "%.3f", type = "row", lookup = res5$Statistic)
+#  fmt <- flist(STD = "%.3f", type = "row", lookup = res6$Statistic)
 #  
 #  # Create vector lookup
 #  vf <- c(MEAN = "Mean", STD = "Std", MEDIAN = "Median",
 #          MIN = "Min", MAX = "Max")
 #  
 #  # Assign formats
-#  formats(res5) <- list(Statistic = vf,
+#  formats(res6) <- list(Statistic = vf,
 #                        Black = fmt,
 #                        Blond = fmt,
 #                        Brown = fmt,
 #                        Red = fmt)
 #  
 #  # Reassign first column name
-#  names(res5)[1] <- "stub"
+#  names(res6)[1] <- "stub"
 #  
 #  # Assign labels
-#  labels(res5) <- list(stub = "Sex")
+#  labels(res6) <- list(stub = "Sex")
 #  
 #  # Create list for reporting
-#  prnt <- list(res$`Hair * Eye`, res$Chisq, res5)
+#  prnt <- list(res$`Hair * Eye`, res$Chisq, res6)
 #  
 #  # Print result
 #  proc_print(prnt,
