@@ -1,5 +1,5 @@
 
-# TTest Procedure ---------------------------------------------------------
+# Reg Procedure ---------------------------------------------------------
 
 
 
@@ -11,11 +11,11 @@
 #' parameter allows you to request additional statistics, similar to the
 #' model options in SAS.  The \code{by}
 #' parameter allows you to subset the data into groups and run the model on each
-#' group.  The \code{weight} parameter let's you assign a weight to each observation
+#' group.  The \code{weight} parameter lets you assign a weight to each observation
 #' in the dataset.  The \code{output} and \code{options} parameters provide
 #' additional customization of the results.
 #' @details
-#' The \code{proc_reg} function is a general purpose regression function.  It
+#' The \code{proc_reg} function is a general-purpose regression function.  It
 #' produces a dataset output by default, and, when working in RStudio,
 #' also produces an interactive report.  The function has many convenient options
 #' for what statistics are produced and how the analysis is performed. All
@@ -176,6 +176,50 @@
 #' These shaping options are passed on the \code{output} parameter.  For example,
 #' to return the data in "long" form, use \code{output = "long"}.
 #'
+#' @section Plots:
+#' The \code{plots} parameter allows you to request several types of regression
+#' plot. Below are the types of plots that are supported.  The list shows
+#' the plot type keyword needed to request the plot, and a brief description:
+#' \itemize{
+#' \item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
+#' types of plots and a table of statistics.
+#' }
+#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
+#' }
+#' \item{\strong{dfbetas}: Displays the influence of each observation
+#' for each coefficient in the model.
+#' }
+#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
+#' }
+#' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
+#' against the regressor, including the fitted line and confidence/prediction bands.
+#' This is only available for models with a single regressor.
+#' }
+#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' }
+#' \item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
+#' }
+#' \item{\strong{residuals}: Produces a panel of residual plots against
+#'  each independent variable in the model.
+#' }
+#' \item{\strong{residualbypredicted}: Residuals vs. Predicted values.
+#' }
+#' \item{\strong{residualhistogram}: Histogram of residuals,
+#' with a normal and kernel curve overlay.
+#' }
+#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+#' }
+#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
+#' }
+#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
+#' }
+#' }
+#' The above plots may be requested in different ways: as a vector of keywords,
+#' or as a call to the \code{\link{regplot}} function.  The keyword approach will
+#' produce plots with a default configuration for each type of plot . A call to
+#' \code{\link{regplot}} will give you control over some plot options.
+#' See the \code{\link{regplot}} function for further details.
+#'
 #' @param data The input data frame for which to perform the regression analysis.
 #' This parameter is required.
 #' @param model A model for the regression to be performed.  The model can be
@@ -190,8 +234,8 @@
 #'  data will be subset on the by variable(s) prior to performing the regression.
 #'  For multiple by variables, pass them as a quoted vector of variable names.
 #'  You may also pass them unquoted using the \code{\link[common]{v}} function.
-#' @param stats Optional statistics keywords.  Valid values are "adjrsq", "clb",
-#' "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
+#' @param stats Optional statistics keywords.  Valid values are "adjrsq", "aic",
+#' "clb", "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 #' "sse", "spec", "seb", and "table".  A single keyword may be passed with or
 #' without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 #' vector using the \code{v()} function.  These statistics keywords largely
@@ -222,6 +266,14 @@
 #' The "noprint" option turns off the interactive report. For other options,
 #' see the \strong{Options} section for explanations of each.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param plots Pass the desired plot(s) on this parameter. Valid values are TRUE,
+#' "all", a vector of plot names, or a call to the \code{\link{regplot}} function.
+#' Default is NULL, meaning no
+#' plots are desired.  If there are multiple model requests, you can pass a single
+#' plot request which will apply to all models, or a list of plot requests that
+#' aligns one-to-one for each model formula.
+#' @param where An expression to filter the rows before statistics are calculated.
+#' Use the \code{\link[base]{expression}} function to define the filter.
 #' @return Normally, the requested regression statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If you request "report" datasets, they will be returned as a list.
@@ -233,6 +285,7 @@
 #' will return a NULL.
 #' @import fmtr
 #' @import tibble
+#' @seealso [regplot()]
 #' @export
 #' @examples
 #' # Turn off printing for CRAN checks
@@ -319,6 +372,58 @@
 #' # 2 mod1   SEB   dist 15.379587         NA   6.7584402  0.4155128 -1.00000000
 #' # 3 mod2 PARMS  speed  3.155753   526.2665   8.2839056 -1.0000000  0.16556757
 #' # 4 mod2   SEB  speed  3.155753         NA   0.8743845 -1.0000000  0.01749448
+#'
+#' # Example 6: Plot requests via a vector of keywords
+#' res7 <- proc_reg(dat, model = dist ~ speed,
+#'                       plots = c("residualhistogram", "fitplot", "qqplot", "cooksd"),
+#'                       output = report)
+#'
+#' # View results
+#' res7
+#' # $NObs
+#' # LABEL NOBS
+#' # 1 Number of Observations Read   50
+#' # 2 Number of Observations Used   50
+#' #
+#' # $ANOVA
+#' # LABEL DF    SUMSQ     MEANSQ     FVAL        PROBF
+#' # 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12
+#' # 2           Error 48 11353.52   236.5317       NA           NA
+#' # 3 Corrected Total 49 32538.98         NA       NA           NA
+#' #
+#' # $FitStatistics
+#' # RMSE DEPMEAN  COEFVAR       RSQ    ADJRSQ
+#' # 1 15.37959   42.98 35.78312 0.6510794 0.6438102
+#' #
+#' # $ParameterEstimates
+#' # PARM DF        EST    STDERR         T        PROBT
+#' # 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02
+#' # 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12
+#' #
+#' # $Plots
+#' # $Plots$residualhistogram
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa81dfb8e6.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$fitplot
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa8361465ed.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$qqplot
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa86ca52064.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$cooksd
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84d614ded.jpg'
+#' # - height: 4.5
+#' # - width: 6
 proc_reg <- function(data,
                      model,
                      by = NULL,
@@ -326,10 +431,11 @@ proc_reg <- function(data,
                      #var = NULL,
                      output = NULL,
                      # freq = NULL, ?
-                     # where = NULL, ?
                      weight = NULL,
                      options = NULL,
-                     titles = NULL
+                     titles = NULL,
+                     plots = NULL,
+                     where = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -337,29 +443,13 @@ proc_reg <- function(data,
   missing <- FALSE
 
   # Deal with single value unquoted parameter values
-  oweight <- deparse(substitute(weight, env = environment()))
-  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else oweight},
-                    error = function(cond) {oweight})
-
-  # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
-
-  ostats <- deparse(substitute(stats, env = environment()))
-  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                  error = function(cond) {ostats})
-
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
-
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                     error = function(cond) {oout})
+  weight <- resolve_arg(weight)
+  by <- resolve_arg(by)
+  stats <- resolve_arg(stats)
+  options <- resolve_arg(options, type = c("integer", "double", "character", "NULL"))
+  output <- resolve_arg(output)
 
   # Parameter checks
-
   if (!"data.frame" %in% class(data)) {
     stop("Input data is not a data frame.")
   }
@@ -388,6 +478,24 @@ proc_reg <- function(data,
       stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
     }
 
+  }
+
+  # Prepare plots for easier processing
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      if (all(plots == TRUE)) {
+        plots <- "regplot"
+      }
+    }
+    if ("regplot" %in% class(plots) |
+        "character" %in% class(plots)) {
+      tplots <- list()
+      for (idx in seq_along(model)) {
+
+        tplots[[idx]] <- plots
+      }
+      plots <- tplots
+    }
   }
 
   # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_reg_syntax01.htm
@@ -424,7 +532,7 @@ proc_reg <- function(data,
 
     sopts <- c("seb", "table", "est", "press",
                "rsquare", "edf", "adjrsq", "mse", "sse", "spec",
-               "clb", "hcc", "hccmethod", "p")
+               "clb", "hcc", "hccmethod", "p", "aic")
 
     nsopts <- names(stats)
 
@@ -469,6 +577,10 @@ proc_reg <- function(data,
 
   res <- NULL
 
+  # Where subset
+  if (!is.null(where)) {
+    data <- subset_data(data, where)
+  }
 
   # Get report if requested
   if (view == TRUE | rptflg) {
@@ -479,7 +591,8 @@ proc_reg <- function(data,
                              titles = titles,
                              opts = options,
                              output = output,
-                             weight = weight)
+                             weight = weight,
+                             plots = plots)
   }
 
   # Get output datasets if requested
@@ -516,6 +629,8 @@ proc_reg <- function(data,
             view = view,
             titles = titles,
             options = options,
+            plots = plots,
+            where = where,
             outcnt = ifelse("data.frame" %in% class(res),
                             1, length(res)))
 
@@ -531,6 +646,18 @@ proc_reg <- function(data,
   return(res)
 }
 
+# data,
+# model,
+# by = NULL,
+# stats = NULL,
+# #var = NULL,
+# output = NULL,
+# # freq = NULL, ?
+# weight = NULL,
+# options = NULL,
+# titles = NULL,
+# plots = NULL,
+# where = NULL
 
 log_reg <- function(data,
                       model = NULL,
@@ -541,11 +668,13 @@ log_reg <- function(data,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
+                      plots = NULL,
+                      where = NULL,
                       outcnt = NULL) {
 
   ret <- c()
 
-  indt <- paste0(rep(" ", 12), collapse = "")
+  indt <- paste0(rep(" ", 10), collapse = "")
 
   ret <- paste0("proc_reg: input data set ", nrow(data),
                 " rows and ", ncol(data), " columns")
@@ -569,6 +698,24 @@ log_reg <- function(data,
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+
+  if (!is.null(options))
+    ret[length(ret) + 1]<- paste0(indt, "options: ", paste(options, collapse = " "))
+
+
+  if (!is.null(where))
+    ret[length(ret) + 1]<- paste0(indt, "where: ", as.character(where))
+
+
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", as.character(plots))
+    } else {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", "(object)")
+    }
+  }
+
 
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
@@ -688,7 +835,8 @@ get_output_specs_reg <- function(model, opts, output,
 #' @import sasLM
 #' @import common
 #' @import fmtr
-get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats = NULL) {
+get_reg_report <- function(data, var, model, opts = NULL, weight = NULL,
+                           stats = NULL, plt = NULL) {
 
   ret <- list()
 
@@ -704,12 +852,17 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
     hasP <- TRUE
   }
 
+  hasPlots <- FALSE
+  if (!is.null(plt)) {
+    hasPlots <- TRUE
+  }
+
   if (!is.null(weight)) {
     reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
-               Weights = data[[weight]], HC = hasHC, Resid = hasP)
+               Weights = data[[weight]], HC = hasHC, Resid = hasP | hasPlots)
   } else {
     reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
-               HC = hasHC, Resid = hasP)
+               HC = hasHC, Resid = hasP | hasPlots)
   }
 
   # NObs
@@ -733,7 +886,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   hc0reg <- NULL
   hc3reg <- NULL
   wreg <- NULL
-  if (hasHC) {
+  if (hasHC | hasPlots) {
     hc0reg <- as.data.frame(unclass(reg$HC0), stringsAsFactors = FALSE)
     hc3reg <- as.data.frame(unclass(reg$HC3), stringsAsFactors = FALSE)
     wreg <- as.data.frame(unclass(reg$`White Test`), stringsAsFactors = FALSE)
@@ -741,7 +894,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
 
   rreg <- NULL
   preg <- NULL
-  if (hasP) {
+  if (hasP | hasPlots) {
      rreg <- reg$Residual
      preg <- reg$Fitted
   }
@@ -886,7 +1039,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                                             PCHISQ = pfmt)
   }
 
-  if (hasP) {
+  if (hasP | hasPlots) {
 
     idcol <- seq(1, length(preg))
     vdat <- get_valid_obs(data, model)
@@ -932,6 +1085,17 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
     } else {
 
       warning("There was a problem creating the statistics and residuals.  Invalid row counts.")
+    }
+  }
+
+  if (hasPlots) {
+
+    # data, var, model, opts = NULL, weight = NULL, stats = NULL, plots = plts
+    ret[["Plots"]] <- render_regplot(data, ret, model, plt, get_alpha(opts))
+
+    if (!hasP) {
+      ret[["OutputStatistics"]] <- NULL
+      ret[["ResidualStatistics"]] <- NULL
     }
   }
 
@@ -999,7 +1163,7 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
            "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
            "t.value" = "T", "Pr...t.." = "PROBT")
 
-  # Add dependtant mean
+  # Add dependent mean
   lkp[paste0(var, ".Mean")] = "DEPMEAN"
 
   # Translate names
@@ -1070,6 +1234,12 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
     if (has_option(stats, "SBC"))
       ret[["SBC"]] <- freg$ADJRSQ
 
+  }
+
+  if (has_option(stats, "AIC")) {
+    fit <- lm(model, data)
+    aicv <- extractAIC(fit)
+    ret[["AIC"]] <- aicv[2]
   }
 
   # Convert to data frame
@@ -1290,7 +1460,8 @@ gen_report_reg <- function(data,
                            output = NULL,
                            view = TRUE,
                            titles = NULL,
-                           weight = NULL) {
+                           weight = NULL,
+                           plots = NULL) {
 
 
   spcs <- get_output_specs_reg(model, opts, output, report = TRUE)
@@ -1303,7 +1474,6 @@ gen_report_reg <- function(data,
 
   # Assign CL Percentage on Labels
   alph <- (1 - get_alpha(opts)) * 100
-
 
   #browser()
 
@@ -1340,11 +1510,14 @@ gen_report_reg <- function(data,
     dtlst <- list(data)
   }
 
+  mnum <- 0
+
   # Loop through models
   for (nm in nms) {
 
     outp <- spcs[[nm]]
     vnm <- outp$var
+    mnum <- mnum + 1
 
     # Loop through by groups
     for (j in seq_len(length(dtlst))) {
@@ -1359,7 +1532,8 @@ gen_report_reg <- function(data,
 
       # data, var, model, report = TRUE, opts = NULL,
       byres[[bynm]] <- get_reg_report(dt, vnm, outp$formula, opts = opts,
-                                      weight = weight, stats = stats)
+                                      weight = weight, stats = stats,
+                                      plt = plots[[mnum]])
 
       # Assign titles
       ttls <- c()

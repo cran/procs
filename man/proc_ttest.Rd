@@ -13,7 +13,10 @@ proc_ttest(
   by = NULL,
   class = NULL,
   options = NULL,
-  titles = NULL
+  titles = NULL,
+  order = NULL,
+  plots = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -72,6 +75,28 @@ The "h0 = " option sets the baseline hypothesis value for single-variable
 hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{order}{Determines the order of class variable values in the analysis.
+Valid values are "data", "formatted", "freq", and "internal". Default is
+NULL, which corresponds to "internal".}
+
+\item{plots}{A plot request. Valid values are NULL, TRUE, "all", a vector
+of plot names, or a call to \code{\link{ttestplot}}.  The value TRUE will
+give you a default set of
+plots appropriate for the test you are performing. The value "all" will
+give you all available plots for the test you are performing. To request
+specific plots, pass a vector of plot names or call
+\code{\link{ttestplot}} and pass the desired plot names on the \code{type}
+parameter. See
+the \code{\link{ttestplot}} documentation for the available plot names
+and additional details. If there are multiple
+variables to test, you may pass one plot request which applies to all tests,
+or multiple plot requests in a list. In the latter case, the plot requests
+should align one to one with the test variables. The default is NULL,
+meaning no plots will be generated.}
+
+\item{where}{An expression to filter the rows before the T-test takes place.
+Use the \code{\link[base]{expression}} function to define the where clause.}
 }
 \value{
 Normally, the requested T-Test statistics are shown interactively
@@ -133,9 +158,7 @@ the appropriate T-Test results for your data based on the known normality.
 
 By default, \code{proc_ttest} results will
 be sent to the viewer as an HTML report.  This functionality
-makes it easy to get a quick analysis of your data. To turn off the
-interactive report, pass the "noprint" keyword
-to the \code{options} parameter.
+makes it easy to get a quick analysis of your data.
 
 The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
@@ -144,6 +167,12 @@ The exact datasets used for the interactive report can be returned as a list.
 To return these datasets, pass
 the "report" keyword on the \code{output} parameter. This list may in
 turn be passed to \code{\link{proc_print}} to write the report to a file.
+
+To turn off the
+interactive report, pass the "noprint" keyword
+to the \code{options} parameter. If you want to turn off the interactive
+report for all procedures, set the global option
+\code{options("procs.print" = FALSE)}.
 }
 
 \section{Dataset Output}{
@@ -187,6 +216,32 @@ setting the package print option to false:
 }
 }
 
+\section{Class Order}{
+
+For analysis of two independent samples, the order of the class values can effect
+the statistical results. The \code{order} parameter allows you to control
+that order. The parameter takes four possible values:
+\itemize{
+\item{\strong{internal}: The internal or "natural" order of the class values.
+For character variables, "internal" means alphabetical order.  For factors,
+"internal" means by order of the levels.}
+\item{\strong{data}: "data" order is different from "internal" order.  "data"
+order means the order that the data appears in the incoming data frame, which
+may or may not be the same as the "internal" order. This
+choice essentially sorts the class values according to however the
+class variable values were encountered in the incoming data.}
+\item{\strong{freq}: The "freq" order value means to sort the class values in
+descending frequency order.}
+\item{\strong{formatted}: If there is a format assigned to the class variable,
+you may also use "formatted" order.  "formatted" order means to apply the
+format to the class variable and then sort the analysis according to the
+order specified in the format.  The format should be a user-defined
+format as defined in the \strong{fmtr} package.}
+}
+Note that the \code{order} parameter applies to both the interactive report
+and the data frame output.
+}
+
 \section{Data Shaping}{
 
 The output datasets produced by the function can be shaped
@@ -210,6 +265,18 @@ columns, and variables are in rows. This shaping option is the default.
 }
 These shaping options are passed on the \code{output} parameter.  For example,
 to return the data in "long" form, use \code{output = "long"}.
+}
+
+\section{Plots}{
+
+In addition to T-test statistics, you may request that plots be displayed
+on the interactive report.  The simplest way to request plots is to
+pass the value TRUE on the \code{plots} parameters.  This action will produce
+default plots appropriate for the type of analysis you are performing.
+You may also pass a vector of plot type strings.  The available plot types
+are "agreement", "boxplot", "histogram",
+"interval", "profiles", "qqplot", and "summary".  See the documentation
+for \code{\link{ttestplot}} for more information.
 }
 
 \examples{
@@ -346,4 +413,50 @@ res5
 # 2     T  3.41296500
 # 3 PROBT  0.00291762
 
+# Example 6: Plots
+res6 <- proc_ttest(dat, var = "group1", options = c("h0" = 0),
+                   output = report,   # To return plot objects
+                   plots = TRUE)      # Request default plots
+
+# View results
+res6
+# $Statistics
+# N MEAN     STD    STDERR  MIN MAX
+# 1 10 0.75 1.78901 0.5657345 -1.6 3.7
+#
+# $ConfLimits
+# MEAN       LCLM    UCLM     STD  LCLMSTD  UCLMSTD
+# 1 0.75 -0.5297804 2.02978 1.78901 1.230544 3.266034
+#
+# $TTests
+# DF       T     PROBT
+# 1  9 1.32571 0.2175978
+#
+# $Plots
+# $Plots$summary
+# # A plot specification:
+# - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa866215cf2.jpg'
+# - height: 4.5
+# - width: 6
+#
+# $Plots$qqplot
+# # A plot specification:
+# - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84693581d.jpg'
+# - height: 4.5
+# - width: 6
+
+# Example 7: Order and Where expression
+res7 <- proc_ttest(sleep, var = "extra", class = "group",
+                   order = "freq",
+                   where = expression(extra > 0))
+# View results
+res7$Statistics
+#     VAR      CLASS        METHOD  N MEAN      STD    STDERR MIN MAX
+# 1 extra          2          <NA>  9 2.60 1.920937 0.6403124 0.1 5.5
+# 2 extra          1          <NA>  5 2.12 1.406058 0.6288084 0.7 3.7
+# 3 extra Diff (1-2)        Pooled NA 0.48       NA 0.9850663  NA  NA
+# 4 extra Diff (1-2) Satterthwaite NA 0.48       NA 0.8974408  NA  NA
+}
+\seealso{
+\code{\link[=ttestplot]{ttestplot()}}
 }

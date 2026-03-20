@@ -50,6 +50,12 @@ Useful links:
 \author{
 \strong{Maintainer}: David Bosak \email{dbosak01@gmail.com}
 
+Authors:
+\itemize{
+  \item Diyu Yang \email{yang0diyu@gmail.com}
+  \item Athenkosi Nkonyeni \email{athenkosi.nkonyeni@outlook.com}
+}
+
 Other contributors:
 \itemize{
   \item Kevin Kramer \email{kkrame02@amgen.com} [contributor]

@@ -20,6 +20,28 @@
 #' the by parameter if passed.  Otherwise, the function will dedupe on
 #' all variables returned.}
 #' }
+#' @section Missing Values:
+#' Missing values are handled in R differently than they are handled in SAS.
+#' In R, missing values (NA) are sorted last, and most sorting
+#' functions in R give you an option to sort them first if desired.
+#'
+#' SAS, on the other hand, considers a missing as the smallest value.  If the
+#' sort is ascending, it will sort the missing values first.  If the sort is
+#' descending, it will sort the missing values last.
+#'
+#' The \code{na.sort} parameter on \code{proc_sort} gives you a choice of
+#' how NAs are sorted.  By default, the function sorts in the standard R
+#' manner.  If you are trying to replicate a SAS sort, set the
+#' value to "sas".
+#'
+#' Note that this parameter only sorts NA values in a manner similar to SAS.
+#' It does not guarantee that the entire sort will match SAS.  There can
+#' still be differences in the sort caused by formats, character-set mismatch,
+#' or other reasons.
+#'
+#' If you want to always use the SAS style sort, you can set it as a global
+#' option, like this: \code{options("procs.na.sort" = "sas")}.
+#'
 #' @param data The input data to sort.
 #' @param by A vector of variables to sort by.
 #' @param keep A vector of variables on the output data to keep.  All other
@@ -39,6 +61,17 @@
 #' variable as a factor.  This parameter therefore allows you to use
 #' the factor for the sort, but then convert back to a character
 #' once the sort is complete.
+#' @param na.sort An option that determines how to sort NA values.  Valid
+#' values are NULL, "first", "last", and "sas". Values may be quoted or
+#' unquoted. The "sas"
+#' value will sort NAs first for ascending keys, and last for descending
+#' keys.  The NA sort style may be controlled globally with
+#' \code{options("procs.na.sort" = <value>)}.  Any values passed
+#' on the local parameter will override the global setting. The default
+#' value is NULL, which defers to the global setting.  If the global setting
+#' is also NULL, the parameter will default to "last".
+#' @param where An expression to filter the rows before the sort takes place.
+#' Use the \code{\link[base]{expression}} function to define the where clause.
 #' @return The sorted dataset.  If a data frame was input, a
 #' data frame will be output.  If a tibble was input, a tibble will
 #' be output.
@@ -105,38 +138,33 @@
 #' @import tibble
 #' @export
 proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
-                      options = NULL, as.character = FALSE) {
-
-
-  # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+                      options = NULL, as.character = FALSE, na.sort = NULL,
+                      where = NULL) {
 
   # Deal with single value unquoted parameter values
-  okeep <- deparse(substitute(keep, env = environment()))
-  keep <- tryCatch({if (typeof(keep) %in% c("character", "NULL")) keep else okeep},
-                 error = function(cond) {okeep})
+  by <- resolve_arg(by)
+  keep <- resolve_arg(keep)
+  order <- resolve_arg(order)
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
+  na.sort <-  resolve_arg(na.sort)
 
-
-  # Deal with single value unquoted parameter values
-  oorder <- deparse(substitute(order, env = environment()))
-  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else oorder},
-                 error = function(cond) {oorder})
-
-  # Deal with single value unquoted option values
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
+  # Force to lower case
+  if (!is.null(na.sort)) {
+    na.sort <- tolower(na.sort)
+  }
 
   # Parameter checks
-
   if (!"data.frame" %in% class(data)) {
     stop("Input data is not a data frame.")
   }
 
   if (nrow(data) == 0) {
     stop("Input data has no rows.")
+  }
+
+  # Deal with where expression
+  if (!is.null(where)) {
+    data <- subset_data(data, where)
   }
 
   if (!is.null(order)) {
@@ -172,7 +200,42 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   }
 
 
-  ret <- sort(data, by = by, ascending = asc )
+  if (is.null(na.sort)) {
+    # Get any global sort settings
+    osrt <- options("procs.na.sort")
+    if (!is.null(osrt$procs.na.sort)) {
+      na.sort <- osrt$procs.na.sort
+    } else {
+      na.sort <- "last"
+    }
+  }
+
+  # Check na.sort
+  if (!is.null(na.sort)) {
+    if (!na.sort %in% c("first", "last", "sas")) {
+      stop(paste0("Value '", na.sort, "' for na.sort is invalid.\n",
+                  "Valid values are: 'first', 'last', 'sas' or NULL."))
+    }
+  }
+
+  nsrt <- TRUE
+  if (na.sort == "first") {
+    nsrt <- FALSE
+  } else if (na.sort == "last") {
+    nsrt <- TRUE
+  } else if (na.sort == "sas") {
+    nsrt <- c()
+    for (av in asc) {
+      if (av) {
+        nsrt <- append(nsrt, FALSE)
+      } else {
+        nsrt <- append(nsrt, TRUE)
+      }
+    }
+  }
+
+  # Perform sort
+  ret <- sort(data, by = by, ascending = asc, na.last = nsrt)
 
   # Order and keep
   ret <- ret[ , keep, drop = FALSE]
@@ -198,6 +261,8 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
            keep = keep,
            order = order,
            options = options,
+           as.character = as.character,
+           na.sort = na.sort,
            outdata = ret)
 
   if (log_output()) {
@@ -216,6 +281,8 @@ log_sort <- function(data,
                      keep = NULL,
                      order = "ascending",
                      options = NULL,
+                     as.character = as.character,
+                     na.sort = na.sort,
                      outdata = NULL) {
 
   ret <- c()
@@ -238,6 +305,12 @@ log_sort <- function(data,
 
   if (!is.null(options))
     ret[length(ret) + 1] <- paste0(indt, "options: ", paste(options, collapse = " "))
+
+  if (!is.null(as.character))
+    ret[length(ret) + 1] <- paste0(indt, "as.character: ", paste(as.character, collapse = " "))
+
+  if (!is.null(na.sort))
+    ret[length(ret) + 1] <- paste0(indt, "na.sort: ", paste(na.sort, collapse = " "))
 
   if (!is.null(outdata))
     ret[length(ret) + 1]  <- paste0(indt, "output data set ", nrow(outdata),

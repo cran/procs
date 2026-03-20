@@ -77,7 +77,7 @@ knitr::opts_chunk$set(
 #  # Turn off TYPE and FREQ variables
 #  res3 <- proc_means(dat,
 #                     stats = v(median, sum, q1, q3),
-#                     output = all,
+#                     output = out,
 #                     options = v(notype, nofreq))
 #  
 #  # View results
@@ -194,6 +194,79 @@ knitr::opts_chunk$set(
 #  # 11  Q     C    1    3   x      3  10  2.0   5
 #  # 12  Q     C    1    3   z     63 199 55.0  81
 #  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  dat2 <- read.table(header = TRUE, text = '
+#                  Name      Assessment     Score   Weight
+#                  Smith     Quiz1          84      0.05
+#                  Smith     Quiz2          25      0.05
+#                  Smith     Midterm        85      0.35
+#                  Smith     Quiz3           0      0.05
+#                  Smith     Quiz4          62      0.05
+#                  Smith     Final          93      0.45
+#                  Wang      Quiz1         100      0.05
+#                  Wang      Quiz2          95      0.05
+#                  Wang      Midterm        98      0.35
+#                  Wang      Quiz3         105      0.05
+#                  Wang      Quiz4          87      0.05
+#                  Wang      Final          96      0.45')
+#  
+#  # View data
+#  dat2
+#  #     Name Assessment Score Weight
+#  # 1  Smith      Quiz1    84   0.05
+#  # 2  Smith      Quiz2    25   0.05
+#  # 3  Smith    Midterm    85   0.35
+#  # 4  Smith      Quiz3     0   0.05
+#  # 5  Smith      Quiz4    62   0.05
+#  # 6  Smith      Final    93   0.45
+#  # 7   Wang      Quiz1   100   0.05
+#  # 8   Wang      Quiz2    95   0.05
+#  # 9   Wang    Midterm    98   0.35
+#  # 10  Wang      Quiz3   105   0.05
+#  # 11  Wang      Quiz4    87   0.05
+#  # 12  Wang      Final    96   0.45
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  res <- proc_means(dat2, var = Score,
+#                    class = Name,
+#                    options = "nway",
+#                    stats = v(n, mean, median, std, min, max, vari))
+#  
+#  # View results
+#  res
+#  #   CLASS TYPE FREQ   VAR N     MEAN MEDIAN       STD MIN MAX       VARI
+#  # 1 Smith    1    6 Score 6 58.16667     73 37.679791   0  93 1419.76667
+#  # 2  Wang    1    6 Score 6 96.83333     97  5.980524  87 105   35.76667
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  res <- proc_means(dat2, var = Score,
+#                    class = Name,
+#                    weight = Weight,
+#                    options = c("nway", vardef = "wgt"),
+#                    stats = v(n, mean, median, std, min, max, vari))
+#  
+#  # View results
+#  res
+#  #   CLASS TYPE FREQ   VAR N  MEAN MEDIAN       STD MIN MAX     VARI
+#  # 1 Smith    1    6 Score 6 80.15     85 23.937993   0  93 573.0275
+#  # 2  Wang    1    6 Score 6 96.85     96  3.102821  87 105   9.6275
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  res <- proc_means(dat2, var = Score,
+#                    class = Name,
+#                    weight = Weight,
+#                    options = c("nway", vardef = "wgt"),
+#                    stats = v(n, mean, median, std, min, max, vari),
+#                    where = expression(Score <= 100)
+#                    )
+#  
+#  # View results
+#  res
+#  #   CLASS TYPE FREQ   VAR N     MEAN MEDIAN      STD MIN MAX       VARI
+#  # 1 Smith    1    6 Score 6 80.15000     85 23.93799   0  93 573.027500
+#  # 2  Wang    1    5 Score 5 96.42105     96  2.54053  87 100   6.454294
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  # Shape wide

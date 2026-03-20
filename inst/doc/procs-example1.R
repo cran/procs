@@ -125,30 +125,7 @@ knitr::opts_chunk$set(
 #  proc_transpose(age_comb,
 #                 var = names(age_comb),
 #                 copy = VAR, id = BY,
-#                 name = LABEL) -> age_trans
-#  
-#  
-#  put("Calculate aov")
-#  age_aov <- aov(AGE ~ ARM, data = adsl) |>
-#    summary()
-#  
-#  put("Get aov into proper data frame")
-#  
-#  age_aov <- age_aov[[1]][1, c("F value", "Pr(>F)")]
-#  names(age_aov) <- c("AOV.F", "AOV.P")
-#  age_aov <- as.data.frame(age_aov) |> put()
-#  
-#  put("Combine aov statistics")
-#  datastep(age_aov,
-#           keep = PVALUE,
-#           format = fc,
-#           {
-#             PVALUE <- fapply2(AOV.F, AOV.P)
-#  
-#           }) -> age_aov_comb
-#  
-#  put("Append aov")
-#  datastep(age_trans, merge = age_aov_comb, {}) -> age_block
+#                 name = LABEL) -> age_block
 #  
 #  
 #  # Sex Block ---------------------------------------------------------------
@@ -186,26 +163,8 @@ knitr::opts_chunk$set(
 #           }) -> sex_cnts
 #  
 #  put("Sort by label")
-#  proc_sort(sex_cnts, by = LABEL) -> sex_cnts
+#  proc_sort(sex_cnts, by = LABEL) -> sex_block
 #  
-#  
-#  put("Get sex chisq")
-#  proc_freq(adsl, tables = v(SEX * ARM),
-#            options = v(chisq, notable)) -> sex_chisq
-#  
-#  put("Combine chisq statistics")
-#  datastep(sex_chisq,
-#           format = fc,
-#           keep = PVALUE,
-#           {
-#  
-#             PVALUE = fapply2(VAL, PROB)
-#           }) -> sex_chisq_comb
-#  
-#  put("Append chisq")
-#  datastep(sex_cnts,
-#           merge = sex_chisq_comb,
-#           {}) -> sex_block
 #  
 #  
 #  # Race block --------------------------------------------------------------
@@ -247,21 +206,6 @@ knitr::opts_chunk$set(
 #  put("Sort by label")
 #  proc_sort(race_cnts, by = LABEL) -> race_block
 #  
-#  put("Get race chisq")
-#  proc_freq(adsl, tables = RACE * ARM,
-#            options = v(chisq, notable)) -> race_chisq
-#  
-#  put("Combine chisq statistics")
-#  datastep(race_chisq,
-#           format = fc,
-#           keep = c("PVALUE"),
-#           {
-#  
-#             PVALUE = fapply2(CHISQ, CHISQ.P)
-#           }) -> race_chisq_comb
-#  
-#  put("Append chisq")
-#  datastep(race_cnts, merge = race_chisq_comb, {}) -> race_block
 #  
 #  # Age Group Block ----------------------------------------------------------
 #  
@@ -299,21 +243,6 @@ knitr::opts_chunk$set(
 #           drop = NAME,
 #           {}) -> ageg_block
 #  
-#  put("Get ageg chisq")
-#  proc_freq(adsl, tables = AGECAT * ARM,
-#            options = v(chisq, notable)) -> ageg_chisq
-#  
-#  put("Combine chisq statistics")
-#  datastep(ageg_chisq,
-#           format = fc,
-#           keep = c("PVALUE"),
-#           {
-#             PVALUE = fapply2(VAL, PROB)
-#           }) -> ageg_chisq_comb
-#  
-#  put("Append chisq")
-#  datastep(ageg_cnts, merge = ageg_chisq_comb,
-#           {}) -> ageg_block
 #  
 #  put("Combine blocks into final data frame")
 #  datastep(age_block,
@@ -326,30 +255,27 @@ knitr::opts_chunk$set(
 #  
 #  var_fmt <- c("AGE" = "Age", "AGECAT" = "Age Group", "SEX" = "Sex", "RACE" = "Race")
 #  
-#  plbl <- "Tests of Association{supsc('1')}\n Value (P-Value)"
-#  
 #  # Create Table
-#  tbl <- create_table(final, first_row_blank = TRUE) |>
+#  tbl <- create_table(final, header_bold = TRUE, borders = "top") |>
 #    column_defaults(from = `ARM A`, to = `ARM D`, align = "center", width = 1.1) |>
 #    stub(vars = c("VAR", "LABEL"), "Variable", width = 2.5) |>
-#    define(VAR, blank_after = TRUE, dedupe = TRUE, label = "Variable",
+#    define(VAR, group_border = TRUE, dedupe = TRUE, label = "Variable",
 #           format = var_fmt,label_row = TRUE) |>
 #    define(LABEL, indent = .25, label = "Demographic Category") |>
 #    define(`ARM A`,  label = "Placebo", n = arm_pop["ARM A"]) |>
 #    define(`ARM B`,  label = "Drug 50mg", n = arm_pop["ARM B"]) |>
 #    define(`ARM C`,  label = "Drug 100mg", n = arm_pop["ARM C"]) |>
 #    define(`ARM D`,  label = "Competitor", n = arm_pop["ARM D"]) |>
-#    define(PVALUE, label = plbl, width = 2, dedupe = TRUE, align = "center") |>
 #    titles("Table 1.0", "Analysis of Demographic Characteristics",
-#           "Safety Population", bold = TRUE) |>
+#           "Safety Population", bold = TRUE, font_size = 12,
+#           borders = "top") |>
 #    footnotes("Program: DM_Table.R",
 #              "NOTE: Denominator based on number of non-missing responses.",
-#              "{supsc('1')}Pearson's Chi-Square tests will be used for "
-#              %p% "Categorical variables and ANOVA tests for continuous variables.")
+#              blank_row = "none", font_size = 10, italics = TRUE)
 #  
 #  rpt <- create_report(file.path(tmp, "ProcsDemoDM.rtf"),
 #                       output_type = "RTF",
-#                       font = "Times") |>
+#                       font = "Arial", font_size = 11) |>
 #    page_header("Sponsor: Company", "Study: ABC") |>
 #    set_margins(top = 1, bottom = 1) |>
 #    add_content(tbl) |>
@@ -366,10 +292,11 @@ knitr::opts_chunk$set(
 #  
 #  
 #  # Uncomment to view report
-#  # file.show(res$modified_path)
+#  # file.show(res$path)
 #  
 #  # Uncomment to view log
 #  # file.show(lf)
+#  
 #  
 #  
 

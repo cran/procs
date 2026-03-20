@@ -80,7 +80,7 @@ Observe that the results of the function is a list of three data frames:
 "Statistics", "ConfLimits", and "TTests".  If working in RStudio and printing
 is enabled, these same three result sets will be sent to the viewer:
 
-<img src="../man/images/ttest1.png"/>
+<img src="../man/images/ttest1.png" alt="One sample t-test output"/>
 
 The interactive report allows you to quickly get a snapshot of statistical 
 values for your data, and can help you determine the next course of action.
@@ -124,7 +124,7 @@ res2
 ```
 The interactive output looks like this:
 
-<img src="../man/images/ttest2.png"/>
+<img src="../man/images/ttest2.png" alt="two sample t-test output"/>
 
 Notice that the output of the two independent variable T-Test is 
 different than the single variable T-Test.  The two variable T-Test
@@ -175,7 +175,7 @@ res3
 ```
 Here is the interactive report:
 
-<img src="../man/images/ttest3.png"/>
+<img src="../man/images/ttest3.png" alt="Paired t-test output"/>
 
 The paired analysis is used when you have some sort of natural relationship
 between the variables.  Note that the **procs** T-Test function does not support
@@ -216,7 +216,7 @@ res5
 ```
 For the interactive report, the by groups will be separated onto their own page:
 
-<img src="../man/images/ttest4.png"/>
+<img src="../man/images/ttest4.png" alt="t-test by group output"/>
 
 
 ## Output Datasets
@@ -370,6 +370,49 @@ res7
 # 6 Weight PROBT  2.754086e-06
 
 ```
+## Plots
+`proc_ttest()` can generate plots for all types of T-tests. The plots are 
+very easy to generate.  You will use the `plots` parameter to make plot requests,
+and these requests can be accomplished in several ways:
 
+* **plots = TRUE**: A TRUE
+value will return a default set of plots for `proc_ttest()`.  The default
+plots change depending on what type of analysis you are performing.  All
+types of analysis include at least a summary distribution chart and a QQ plot.
+A paired analysis will also include a paired profiles chart and an agreement
+plot.
+* **plots = "all"**: The "all" keyword will return all available plots for 
+the requested test.
+* **plots = [vector of strings]**: Plots may be
+requested as a vector of plot names.  These names are normally quoted, but 
+may also be passed unquoted using the `v()` function. The available plot names are 
+"agreement", "boxplot", "histogram", "interval", "profiles", "qqplot", and "summary".
+* **plots = ttestplot([with parameters])**: The `ttestplot()` function 
+gives you the most control over the charts produced. This function takes
+parameters which allow you to specify which charts to show, and some 
+other customization features. See the `ttestplot()` function
+for additional details.
+
+Let's re-run the one sample T-Test from above, but this time with plots.
+In this case, we want to see the null hypothesis on the chart, and request
+an interval chart in addition to the default summary and qqplot.  Therefore, 
+we can perform a custom plot request with the `ttestplot()` function and
+pass the desired parameters:
+```{r eval=FALSE, echo=TRUE} 
+# One sample T-Test with plots
+proc_ttest(cls, var = Height, options = c(h0 = 65),
+           plots = ttestplot(c("summary", "qqplot", "interval"), 
+                             showh0 = TRUE))
+
+
+```
+
+<img src="../man/images/ttest5a.png" alt="Proc ttest plots 1"/>
+<img src="../man/images/ttest5b.png" alt="Proc ttest plots 2"/>
+<img src="../man/images/ttest5c.png" alt="Proc ttest plots 3"/>
+
+Notice the amount of analysis performed by a single call to `proc_ttest()`. 
+These functions are designed with needs of the analyst in mind, and can 
+give you an enormous amount of information with very little effort.
 
 Next: [Regression Function](procs-reg.html)

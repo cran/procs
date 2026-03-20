@@ -114,7 +114,8 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  # Perform T-Test
-#  res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+#  res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter",
+#                     plots = TRUE)
 #  
 #  # View results
 #  res3

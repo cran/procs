@@ -1,3 +1,15 @@
+# procs 1.0.8
+
+* Added "order" parameter to `proc_freq()` and `proc_ttest()`.
+* Added "plots" parameter to `proc_freq()`, `proc_reg()`, and `proc_ttest()`.
+* Added "AIC" statistic to `proc_reg()`.
+* Added "weight" parameter to `proc_means()`.
+* Added "vardef" option to `proc_means()`.
+* Added "na.sort" parameter to `proc_sort()`.
+* Added "where" parameter to `proc_freq()`, `proc_means()`, `proc_ttest()`,
+`proc_reg()`, and `proc_sort()`.
+* Updates to documentation.
+
 # procs 1.0.7
 
 * Fixed bug on `prog_reg()` where by-variable was not populating for all rows

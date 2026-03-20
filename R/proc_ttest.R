@@ -53,9 +53,7 @@
 #' @section Interactive Output:
 #' By default, \code{proc_ttest} results will
 #' be sent to the viewer as an HTML report.  This functionality
-#' makes it easy to get a quick analysis of your data. To turn off the
-#' interactive report, pass the "noprint" keyword
-#' to the \code{options} parameter.
+#' makes it easy to get a quick analysis of your data.
 #'
 #' The \code{titles} parameter allows you to set one or more titles for your
 #' report.  Pass these titles as a vector of strings.
@@ -64,6 +62,12 @@
 #' To return these datasets, pass
 #' the "report" keyword on the \code{output} parameter. This list may in
 #' turn be passed to \code{\link{proc_print}} to write the report to a file.
+#'
+#' To turn off the
+#' interactive report, pass the "noprint" keyword
+#' to the \code{options} parameter. If you want to turn off the interactive
+#' report for all procedures, set the global option
+#' \code{options("procs.print" = FALSE)}.
 #'
 #' @section Dataset Output:
 #' Dataset results are also returned from the function by default.
@@ -101,6 +105,29 @@
 #' \code{options("procs.print" = FALSE)}.
 #' }
 #' }
+#' @section Class Order:
+#' For analysis of two independent samples, the order of the class values can effect
+#' the statistical results. The \code{order} parameter allows you to control
+#' that order. The parameter takes four possible values:
+#' \itemize{
+#' \item{\strong{internal}: The internal or "natural" order of the class values.
+#' For character variables, "internal" means alphabetical order.  For factors,
+#' "internal" means by order of the levels.}
+#' \item{\strong{data}: "data" order is different from "internal" order.  "data"
+#' order means the order that the data appears in the incoming data frame, which
+#' may or may not be the same as the "internal" order. This
+#' choice essentially sorts the class values according to however the
+#' class variable values were encountered in the incoming data.}
+#' \item{\strong{freq}: The "freq" order value means to sort the class values in
+#' descending frequency order.}
+#' \item{\strong{formatted}: If there is a format assigned to the class variable,
+#' you may also use "formatted" order.  "formatted" order means to apply the
+#' format to the class variable and then sort the analysis according to the
+#' order specified in the format.  The format should be a user-defined
+#' format as defined in the \strong{fmtr} package.}
+#' }
+#' Note that the \code{order} parameter applies to both the interactive report
+#' and the data frame output.
 #' @section Data Shaping:
 #' The output datasets produced by the function can be shaped
 #' in different ways. These shaping options allow you to decide whether the
@@ -123,6 +150,15 @@
 #' }
 #' These shaping options are passed on the \code{output} parameter.  For example,
 #' to return the data in "long" form, use \code{output = "long"}.
+#' @section Plots:
+#' In addition to T-test statistics, you may request that plots be displayed
+#' on the interactive report.  The simplest way to request plots is to
+#' pass the value TRUE on the \code{plots} parameters.  This action will produce
+#' default plots appropriate for the type of analysis you are performing.
+#' You may also pass a vector of plot type strings.  The available plot types
+#' are "agreement", "boxplot", "histogram",
+#' "interval", "profiles", "qqplot", and "summary".  See the documentation
+#' for \code{\link{ttestplot}} for more information.
 # @section Data Constraints:
 # Explain limits of data for each stat option.  Number of non-missing
 # values, etc.
@@ -176,6 +212,25 @@
 #' The "h0 = " option sets the baseline hypothesis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param order Determines the order of class variable values in the analysis.
+#' Valid values are "data", "formatted", "freq", and "internal". Default is
+#' NULL, which corresponds to "internal".
+#' @param plots A plot request. Valid values are NULL, TRUE, "all", a vector
+#' of plot names, or a call to \code{\link{ttestplot}}.  The value TRUE will
+#' give you a default set of
+#' plots appropriate for the test you are performing. The value "all" will
+#' give you all available plots for the test you are performing. To request
+#' specific plots, pass a vector of plot names or call
+#' \code{\link{ttestplot}} and pass the desired plot names on the \code{type}
+#' parameter. See
+#' the \code{\link{ttestplot}} documentation for the available plot names
+#' and additional details. If there are multiple
+#' variables to test, you may pass one plot request which applies to all tests,
+#' or multiple plot requests in a list. In the latter case, the plot requests
+#' should align one to one with the test variables. The default is NULL,
+#' meaning no plots will be generated.
+#' @param where An expression to filter the rows before the T-test takes place.
+#' Use the \code{\link[base]{expression}} function to define the where clause.
 #' @return Normally, the requested T-Test statistics are shown interactively
 #' in the viewer, and output results are returned as a list of data frames.
 #' You may then access individual datasets from the list using dollar sign ($)
@@ -185,6 +240,7 @@
 #' \code{output} parameter.
 #' @import fmtr
 #' @import tibble
+#' @seealso [ttestplot()]
 #' @export
 #' @examples
 #' # Turn off printing for CRAN checks
@@ -320,6 +376,49 @@
 #' # 2     T  3.41296500
 #' # 3 PROBT  0.00291762
 #'
+#' # Example 6: Plots
+#' res6 <- proc_ttest(dat, var = "group1", options = c("h0" = 0),
+#'                    output = report,   # To return plot objects
+#'                    plots = TRUE)      # Request default plots
+#'
+#' # View results
+#' res6
+#' # $Statistics
+#' # N MEAN     STD    STDERR  MIN MAX
+#' # 1 10 0.75 1.78901 0.5657345 -1.6 3.7
+#' #
+#' # $ConfLimits
+#' # MEAN       LCLM    UCLM     STD  LCLMSTD  UCLMSTD
+#' # 1 0.75 -0.5297804 2.02978 1.78901 1.230544 3.266034
+#' #
+#' # $TTests
+#' # DF       T     PROBT
+#' # 1  9 1.32571 0.2175978
+#' #
+#' # $Plots
+#' # $Plots$summary
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa866215cf2.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$qqplot
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84693581d.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#'
+#' # Example 7: Order and Where expression
+#' res7 <- proc_ttest(sleep, var = "extra", class = "group",
+#'                    order = "freq",
+#'                    where = expression(extra > 0))
+#' # View results
+#' res7$Statistics
+#' #     VAR      CLASS        METHOD  N MEAN      STD    STDERR MIN MAX
+#' # 1 extra          2          <NA>  9 2.60 1.920937 0.6403124 0.1 5.5
+#' # 2 extra          1          <NA>  5 2.12 1.406058 0.6288084 0.7 3.7
+#' # 3 extra Diff (1-2)        Pooled NA 0.48       NA 0.9850663  NA  NA
+#' # 4 extra Diff (1-2) Satterthwaite NA 0.48       NA 0.8974408  NA  NA
 proc_ttest <- function(data,
                        var = NULL,
                        paired = NULL,
@@ -329,39 +428,24 @@ proc_ttest <- function(data,
                        # freq = NULL, ?
                        # weight = NULL, ?
                        options = NULL,
-                       titles = NULL
+                       titles = NULL,
+                       order = NULL,
+                       plots = NULL,
+                       where = NULL
 ) {
 
   # SAS seems to always ignore these
   # Not sure why R has an option to keep them
   missing <- FALSE
 
-
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
-
-  # Deal with single value unquoted parameter values
-  oclass <- deparse(substitute(class, env = environment()))
-  class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
-                    error = function(cond) {oclass})
-
-  ovar <- deparse(substitute(var, env = environment()))
-  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                  error = function(cond) {ovar})
-
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
-
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                     error = function(cond) {oout})
-
-  opaired <- deparse(substitute(paired, env = environment()))
-  paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
-                     error = function(cond) {opaired})
+  by <- resolve_arg(by)
+  class <- resolve_arg(class)
+  var <- resolve_arg(var)
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
+  output <- resolve_arg(output)
+  paired <- resolve_arg(paired)
+  order <- resolve_arg(order)
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {
@@ -448,6 +532,48 @@ proc_ttest <- function(data,
     }
   }
 
+  # Prepare plots for easier processing
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      if (plots == TRUE) {
+        plots <- ttestplot()
+      }
+    }
+    if ("character" %in% class(plots)) {
+
+      plots <- ttestplot(type = plots)
+    }
+    if ("ttestplot" %in% class(plots)) {
+      tplots <- list()
+      if (!is.null(var)) {
+        for (idx in seq_along(var)) {
+
+          tplots[[idx]] <- plots
+        }
+      } else if (!is.null(paired)) {
+        for (idx in seq_along(paired)) {
+
+          tplots[[idx]] <- plots
+        }
+
+      }
+      plots <- tplots
+    }
+  }
+
+  # Default order parameter
+  if (is.null(order)) {
+    order <- "internal"
+  } else {
+    order <- tolower(order)
+
+    if (any(!order %in% c("data", "internal", "formatted", "freq"))) {
+      stop(paste0("Invalid value for 'order' parameter: ",
+                  paste0("'", order, "'", collapse = ", "), "\n",
+                  "Valid values are: 'internal', 'freq', 'formatted', and 'data'"))
+    }
+  }
+
 
   rptflg <- FALSE
   rptnm <- ""
@@ -467,13 +593,51 @@ proc_ttest <- function(data,
 
   res <- NULL
 
+  # Where subset
+  if (!is.null(where)) {
+    data <- subset_data(data, where)
+  }
+
+  # Deal with order
+  if (!is.null(order) & !is.null(class)) {
+    if (length(order) != length(class)) {
+      if (length(order) == 1) {
+
+        order <- rep(order, length(class))
+      } else {
+        stop("Order keywords are misaligned with the number of class variables.")
+      }
+    }
+
+    for (idx in seq_len(length(class))) {
+      cl <- class[idx]
+      odr <- order[idx]
+
+      if (odr == "data") {
+         data[[cl]] <- factor(data[[cl]], unique(data[[cl]]))
+      } else if (odr == "formatted") {
+        fmt <- attr(data[[cl]], "format")
+
+        if (!is.null(fmt)) {
+          attr(fmt, "as.factor") <- TRUE
+          data[[cl]] <- fapply(data[[cl]], fmt)
+        }
+      } else if (odr == "freq") {
+        ftbl <- table(data[[cl]])
+        ftbl <- sort(ftbl, decreasing = TRUE)
+        data[[cl]] <- factor(data[[cl]], names(ftbl))
+      } else {
+        # Do nothing.  Internal is default.
+      }
+    }
+  }
 
   # Get report if requested
   if (view == TRUE | rptflg) {
     rptres <- gen_report_ttest(data, by = by, var = var, class = class,
                                paired = paired, view = view,
                                titles = titles, #weight = weight,
-                               opts = options, output = output)
+                               opts = options, output = output, plots = plots)
   }
 
   # Get output datasets if requested
@@ -486,6 +650,11 @@ proc_ttest <- function(data,
                             output = output,
                             opts = options
     )
+
+    # Clear out factors from output datasets
+    if (!is.null(class)) {
+      res <- clear_factors(res, class)
+    }
   }
 
   # Add report to result if requested
@@ -500,7 +669,7 @@ proc_ttest <- function(data,
 
   }
 
-  # Log the means function
+  # Log the ttest function
   log_ttest(data,
             by = by,
             class = class,
@@ -511,6 +680,9 @@ proc_ttest <- function(data,
             view = view,
             titles = titles,
             options = options,
+            order = order,
+            plots = plots,
+            where = where,
             outcnt = ifelse("data.frame" %in% class(res),
                             1, length(res)))
 
@@ -537,6 +709,9 @@ log_ttest <- function(data,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
+                      order = NULL,
+                      plots = NULL,
+                      where = NULL,
                       outcnt = NULL) {
 
   ret <- c()
@@ -570,6 +745,21 @@ log_ttest <- function(data,
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
 
+  if (!is.null(order))
+    ret[length(ret) + 1]<- paste0(indt, "order: ", paste(order, collapse = " "))
+
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", as.character(plots))
+    } else {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", "(object")
+    }
+
+  }
+
+  if (!is.null(where))
+    ret[length(ret) + 1]<- paste0(indt, "where: ", as.character(where))
+
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
 
@@ -595,7 +785,7 @@ ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  log = FALSE)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output,
-                                   report = FALSE) {
+                                   report = FALSE, plots = NULL) {
 
   dat <- data
   spcs <- list()
@@ -615,14 +805,16 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
       stop("Specify either the 'var' or 'paired' parameter, but not both.")
 
-  } else if (!is.null(class)) {
+  } else if (!is.null(class)) {    # Two-Sample T-Test
 
 
     if (report == TRUE) {
 
       stats <- c("n", "mean", "std", "stderr", "min", "max")
 
+      cnt <- 1
       for (vr in var) {
+
 
         vlbl <- ""
         if (length(var) > 1)
@@ -641,6 +833,20 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
         spcs[[paste0(vlbl, "Equality")]] <- out_spec(stats = "dummy", var = vr, types = FALSE, freq = FALSE)
 
+
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+
+          spcs[[paste0(vlbl, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt, class = class)
+        }
+
+
+        cnt <- cnt + 1
       }
 
     } else {
@@ -670,11 +876,10 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
       spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE, shape = shp)
 
-
     }
 
 
-  } else if (is.null(paired) & !is.null(var) & is.null(class)) {
+  } else if (is.null(paired) & !is.null(var) & is.null(class)) {  # 1 Sample T-Test
 
 
     h0 <- get_option(opts, "h0", 0)
@@ -715,6 +920,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
     } else {
 
+      cnt <- 1
       for (vr in var) {
 
         vn <- ""
@@ -737,6 +943,19 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                      type = FALSE, freq = FALSE,
                                      var = paste0("..", vr), report = report, varlbl = vr)
 
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+
+          spcs[[paste0(vn, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt)
+        }
+
+        cnt <- cnt + 1
+
       }
 
     }
@@ -744,9 +963,11 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
 
 
-  } else if (!is.null(paired)) {
+  } else if (!is.null(paired)) {   # Paired T-Test
 
     if (report == TRUE) {
+
+      cnt <- 1
       for (i in seq_len(length(paired))) {
 
         pr <- paired[i]
@@ -781,6 +1002,20 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                      type = FALSE, freq = FALSE,
                                      var = vnm, varlbl = vr,
                                      report = report)
+
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+          plt$varlbl <- vr
+
+          spcs[[paste0(lnm, "Plots")]] <- out_spec(stats = "dummy", var = vnm, varlbl = vr, plots = plt)
+        }
+
+        cnt <- cnt + 1
 
       }
 
@@ -857,7 +1092,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 #' @import sasLM
 #' @import common
 get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
-                            byvar = NULL, byval = NULL, shape = NULL) {
+                            byvar = NULL, byval = NULL, shape = NULL, plt = NULL) {
 
   ret <- list()
 
@@ -1066,6 +1301,8 @@ shape_ttest_data <- function(ds, shape, copy = NULL) {
 
 }
 
+
+
 # Drivers -----------------------------------------------------------------
 
 #' @import common
@@ -1078,11 +1315,13 @@ gen_report_ttest <- function(data,
                              opts = NULL,
                              output = NULL,
                              view = TRUE,
-                             titles = NULL) {
+                             titles = NULL,
+                             plots = NULL,
+                             order = NULL) {
 
-
+  # browser()
   spcs <- get_output_specs_ttest(data, var, paired, class,
-                                 opts, output, report = TRUE)
+                                 opts, output, report = TRUE, plots = plots)
 
   data <- spcs$data
   outreq <- spcs$outreq
@@ -1153,10 +1392,10 @@ gen_report_ttest <- function(data,
         # Get class-level t-tests
         if (!is.null(class)) {
 
-          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts)
+          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts, plots)
         }
 
-        if (is.null(class) ||
+        if (is.null(class) && !tnm %in% "Plots" ||
            (!is.null(class) && tnm %in% c("Statistics", "ConfLimits"))) {   # Fix this
 
           # data, var, class, outp, freq = TRUE,
@@ -1193,79 +1432,83 @@ gen_report_ttest <- function(data,
           }
         }
 
+        if (tnm == "Plots") {
 
-        # Add spanning headers if there are by groups
-        if (!is.null(by) & !is.null(smtbl)) {
+          if (!is.null(plots)) {
 
-          # Add spanning headers
-          # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
-          # attr(smtbl, "spans") <- list(spn)
-
-          bynm <-  bylbls[j]
-
-          if (tnm == "Statistics") {
-
-            attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
+            # Add plots: dat, res, var, plt, alph
+            res[[nm]] <- render_ttestplot(dt, outp$var, outp$plot, class, res)
 
           }
 
-        }
-
-        # Add default formats
-        # fmt <- "%.4f"
-        formats(smtbl) <- ttest_fc
-        # for (cnm in names(smtbl)) {
-        #
-        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
-        #
-        #     attr(smtbl[[cnm]], "format") <- fmt
-        #   }
-        #
-        # }
-
-
-        # Assign labels
-        if (is.null(class))
-          labels(smtbl) <- tlbls
-        else {
-
-          cv <- class
-          if (length(class) == 1)
-            cnms <- "CLASS"
-          else
-            cnms <- paste0("CLASS", seq(1, length(class)))
-
-          names(cv) <- cnms
-
-          labels(smtbl) <- append(as.list(cv), tlbls)
-
-        }
-
-        # Kill var variable for reports
-        if ("VAR" %in% names(smtbl)) {
-
-          smtbl[["VAR"]] <- NULL
-
         } else {
 
-          if (!is.null(outp$varlbl))
-            smtbl[["VAR"]] <- outp$varlbl
-        }
 
-        # Convert to tibble if incoming data is a tibble
-        if ("tbl_df" %in% class(data)) {
-          res[[nm]] <- as_tibble(smtbl)
-        } else {
-          res[[nm]] <- smtbl
+          # Add spanning headers if there are by groups
+          if (!is.null(by) & !is.null(smtbl)) {
+
+            # Add spanning headers
+            # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
+            # attr(smtbl, "spans") <- list(spn)
+
+            bynm <-  bylbls[j]
+
+            if (tnm == "Statistics") {
+
+              attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
+
+            }
+
+          }
+
+          # Add default formats
+          formats(smtbl) <- ttest_fc
+
+          # Assign labels
+          if (is.null(class))
+            labels(smtbl) <- tlbls
+          else {
+
+            cv <- class
+            if (length(class) == 1)
+              cnms <- "CLASS"
+            else
+              cnms <- paste0("CLASS", seq(1, length(class)))
+
+            names(cv) <- cnms
+
+            labels(smtbl) <- append(as.list(cv), tlbls)
+
+          }
+
+          # Kill var variable for reports
+          if ("VAR" %in% names(smtbl)) {
+
+            smtbl[["VAR"]] <- NULL
+
+          } else {
+
+            if (!is.null(outp$varlbl))
+              smtbl[["VAR"]] <- outp$varlbl
+          }
+
+          # Convert to tibble if incoming data is a tibble
+          if ("tbl_df" %in% class(data)) {
+            res[[nm]] <- as_tibble(smtbl)
+          } else {
+            res[[nm]] <- smtbl
+          }
         }
 
       }
 
+      # Clear out factors from report datasets
+      if (!is.null(class)) {
+        res <- clear_factors(res, class)
+      }
+
       byres[[bynm]] <- res
     }
-
-    # Add summary plot  - Commented for now because I can't get it to match SAS.
-    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
 
   }
 

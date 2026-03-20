@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 The **procs** package contains functions that replicate procedures from
-SAS® software. The intention of the package is to ease transition to R
+SAS® software. The intention of the package is to ease R
 adoption by providing SAS® programmers a familiar conceptual framework and 
 functions that produce nearly identical output. Along the way, the 
 functions in the **procs** package also provide much nicer output 
@@ -50,7 +50,7 @@ options to control the output data and display.
 Note that the `options("procs.print" = FALSE)` global option
 has been added to these examples to allow the **procs** package to pass
 CRAN checks.  When running sample code yourself,
-remove this option or set to TRUE.
+remove this option or set it to TRUE.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
@@ -75,7 +75,7 @@ res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
 ```
 When printing is allowed, the `proc_freq()` function will display the 
 following report in the viewer:  
-<img src="../man/images/freq1.png"/>
+<img src="../man/images/freq1.png" alt = "Proc freq example"/>
 
 The function call requested output datasets using the "report" option. If 
 there is more than one output dataset, they will be returned in a list.
@@ -146,7 +146,7 @@ res2 <- proc_means(dt, var = Freq,
 
 The following is sent to the viewer:
 
-<img src="../man/images/means1.png"/>
+<img src="../man/images/means1.png" alt="Proc means example"/>
 
 And here is the output dataset.  Observe that the output dataset
 is not identical to the displayed report.  The output dataset has
@@ -212,10 +212,13 @@ pressure <- read.table(header = TRUE, text = '
 
 ```
 
-Now let's determine if there is a significant change before and after the stimulus:
+Now let's determine if there is a significant change before and after the stimulus.
+For this type of T-Test test, we will use the `paired` parameter.  To better
+understand the data, we will also turn on the default plots:
 ```{r eval=FALSE, echo=TRUE} 
 # Perform T-Test
-res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter", 
+                   plots = TRUE)
 
 # View results
 res3
@@ -234,10 +237,17 @@ res3
 ```
 If printing is enabled, the following is sent to the viewer:
 
-<img src="../man/images/ttest.png"/>
+<img src="../man/images/ttesta.png" alt="Proc ttest example chart 1"/>
+<img src="../man/images/ttestb.png" alt="Proc ttest example chart 2"/>
+<img src="../man/images/ttestc.png" alt="Proc ttest example chart 3"/>
+<img src="../man/images/ttestd.png" alt="Proc ttest example chart 4"/>
 
 The above test shows although there was a change before and after the stimulus, 
-that change was not statistically significant.
+that change was not statistically significant. 
+
+Note that the `proc_freq()` and `proc_req()` functions also have the capability
+to generate plots for the selected analysis. See the documentation of those
+functions for more details.
 
 ### Other Functions
 
@@ -319,7 +329,7 @@ proc_print(prnt,
            view = FALSE) # Set view = TRUE to see results
 
 ```
-<img src="../man/images/print1.png"/>
+<img src="../man/images/print1.png" alt = "Proc print example"/>
 
 If desired, we could print this report to the file system using 
 the `file_path` and `output_type` parameters on `proc_print()`.

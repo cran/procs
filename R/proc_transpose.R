@@ -172,53 +172,17 @@ proc_transpose <- function(data,
   }
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
-
-  # Deal with single value unquoted parameter values
-  ovar <- deparse(substitute(var, env = environment()))
-  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                 error = function(cond) {ovar})
-
-  # Deal with single value unquoted parameter values
-  oid <- deparse(substitute(id, env = environment()))
-  id <- tryCatch({if (typeof(id) %in% c("character", "NULL")) id else oid},
-                 error = function(cond) {oid})
-
-  # Deal with single value unquoted parameter values
-  oidlabel <- deparse(substitute(idlabel, env = environment()))
-  idlabel <- tryCatch({if (typeof(idlabel) %in% c("character", "NULL")) idlabel else oidlabel},
-                 error = function(cond) {oidlabel})
-
-  # Deal with single value unquoted parameter values
-  ocopy <- deparse(substitute(copy, env = environment()))
-  copy <- tryCatch({if (typeof(copy) %in% c("character", "NULL")) copy else ocopy},
-                 error = function(cond) {ocopy})
-
-  oname <- deparse(substitute(name, env = environment()))
-  name <- tryCatch({if (typeof(name) %in% c("character", "NULL")) name else oname},
-                   error = function(cond) {oname})
-
-  onamelabel <- deparse(substitute(namelabel, env = environment()))
-  namelabel <- tryCatch({if (typeof(namelabel) %in% c("character", "NULL")) namelabel else onamelabel},
-                   error = function(cond) {onamelabel})
-
-  oprefix <- deparse(substitute(prefix, env = environment()))
-  prefix <- tryCatch({if (typeof(prefix) %in% c("character", "NULL")) prefix else oprefix},
-                        error = function(cond) {oprefix})
-
-  osuffix <- deparse(substitute(suffix, env = environment()))
-  suffix <- tryCatch({if (typeof(suffix) %in% c("character", "NULL")) suffix else osuffix},
-                     error = function(cond) {osuffix})
-
-  odelimiter <- deparse(substitute(delimiter, env = environment()))
-  delimiter <- tryCatch({if (typeof(delimiter) %in% c("character", "NULL")) delimiter else odelimiter},
-                     error = function(cond) {odelimiter})
-
-  ooptions <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else ooptions},
-                        error = function(cond) {ooptions})
+  by <- resolve_arg(by)
+  var <- resolve_arg(var)
+  id <- resolve_arg(id)
+  idlabel <- resolve_arg(idlabel)
+  copy <- resolve_arg(copy)
+  name <- resolve_arg(name)
+  namelabel <- resolve_arg(namelabel)
+  prefix <- resolve_arg(prefix)
+  suffix <- resolve_arg(suffix)
+  delimiter <- resolve_arg(delimiter)
+  options <- resolve_arg(options)
 
   # Parameter checks
 
@@ -299,7 +263,7 @@ proc_transpose <- function(data,
    nms <- nms[!nms %in% c(by, id, idlabel, copy)]
 
    if (length(nms) == 0) {
-     stop("No variables to transpose.  You may need to specify the var parameter")
+     stop("No variables to transpose. You may need to specify the var parameter")
 
    }
 
@@ -497,8 +461,7 @@ proc_transpose <- function(data,
 
    # Where
    if (!is.null(where)) {
-     res <- subset(res, eval(where))
-
+     res <- subset_data(res, where)
    }
 
    if ("noname" %in% options) {
@@ -537,7 +500,11 @@ proc_transpose <- function(data,
                    copy = copy,
                    name = name,
                    namelabel = namelabel,
+                   prefix = prefix,
+                   delimiter = delimiter,
+                   suffix = suffix,
                    where = where,
+                   options = options,
                    outdata = res)
 
      if (log_output()) {
@@ -559,7 +526,11 @@ log_transpose <- function(data,
                       copy = NULL,
                       name = "NAME",
                       namelabel = NULL,
+                      prefix = prefix,
+                      delimiter = delimiter,
+                      suffix = suffix,
                       where = NULL,
+                      options = options,
                       outdata = NULL) {
 
   ret <- c()
@@ -595,9 +566,20 @@ log_transpose <- function(data,
   if (!is.null(namelabel))
     ret[length(ret) + 1]<- paste0(indt, "namelabel: ", paste(namelabel, collapse = " "))
 
+  if (!is.null(prefix))
+    ret[length(ret) + 1]<- paste0(indt, "prefix: ", paste(prefix, collapse = " "))
+
+  if (!is.null(delimiter))
+    ret[length(ret) + 1]<- paste0(indt, "delimiter: ", paste(delimiter, collapse = " "))
+
+  if (!is.null(suffix))
+    ret[length(ret) + 1]<- paste0(indt, "suffix: ", paste(suffix, collapse = " "))
+
   if (!is.null(where))
     ret[length(ret) + 1] <- paste0(indt, "where: ", paste(as.character(where), collapse = "\n"))
 
+  if (!is.null(options))
+    ret[length(ret) + 1]<- paste0(indt, "options: ", paste(options, collapse = " "))
 
   if (!is.null(outdata))
     ret[length(ret) + 1] <- paste0(indt, "output dataset ", nrow(outdata),

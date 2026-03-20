@@ -1,6 +1,6 @@
 
 
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <- file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -846,28 +846,77 @@ test_that("reg25: by parameter with output options works.", {
 
 })
 
+test_that("reg26: Additional stats parameters.", {
 
-# Testing plots
+  mdls <- list(formula(Weight ~ Height),
+               formula(Weight ~ Age),
+               formula(Weight ~ Height + Age))
 
-# library(ggplot2)
-#
-# ggplot(res2$Statistics, aes(x = PREVAL, y = RESID)) +
-#   geom_point() +
-#   geom_hline(yintercept = 0) +
-#   geom_smooth(se = FALSE, color = "red") +
-#   labs(title='Residual vs. Fitted Values Plot', x='Fitted Values', y='Residuals')
-#
+  # outest
+  res8 <- proc_reg(cls, mdls,
+                   options = OUTEST,
+                   stats = aic
+                   )
+
+  res8
+
+  expect_equal(nrow(res8), 3)
+  expect_equal("AIC" %in% names(res8), TRUE)
+
+  # Below AIC values taken from SAS
+  expect_equal(res8$AIC[1], 93.780394884)
+  expect_equal(res8$AIC[2], 106.62042125)
+  expect_equal(res8$AIC[3], 95.580809248)
+})
+
+test_that("reg27: where expression works as expected.", {
 
 
-# res1 <- proc_reg(cars, dist ~ speed, output = report, stats = p)
-# cars |>
-# ggplot(aes(speed, dist))+
-#   geom_point(aes(size = abs(res1$Statistics$RESID)))+
-#   geom_point(aes(y=res1$Statistics$PREVAL), color="green")+
-#   geom_smooth(method = "lm")+
-#   geom_smooth(se = FALSE, color="blue")+
-#   geom_segment(aes(xend = speed, yend = res1$Statistics$PREVAL), color="red")
-#pltcar
+
+  res1 <- proc_reg(cls, model = Weight ~ Height,
+                   output = "report")
+
+  expect_equal(res1$NObs$NOBS, c(19, 19))
 
 
 
+  res2 <- proc_reg(cls, model = Weight ~ Height,
+                   output = "report",
+                   where = expression(Weight < 150))
+
+  expect_equal(res2$NObs$NOBS, c(18, 18))
+
+
+
+})
+
+
+test_that("reg28: log_reg() works as expected.", {
+
+  # data,
+  # model,
+  # by = NULL,
+  # stats = NULL,
+  # #var = NULL,
+  # output = NULL,
+  # # freq = NULL, ?
+  # weight = NULL,
+  # options = NULL,
+  # titles = NULL,
+  # plots = NULL,
+  # where = NULL
+
+  res <- log_reg(mtcars, model = "x = y z",  by = "region",
+                       stats = c("n", "mean", "median"),
+                       output = c("out", "report", "long"),
+                       weight = "count",
+                       plots = regplot(),
+                       where = expression(x == 1),
+                       options = "noname",
+                       titles = "My Title")
+
+  res
+
+  expect_equal(length(res), 11)
+
+})

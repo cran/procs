@@ -62,6 +62,7 @@ output_report <- function(lst,
 
   }
 
+
   for (j in seq_len(pages)) {
 
 
@@ -72,6 +73,9 @@ output_report <- function(lst,
       pg <- lst[[j]]
     }
 
+    # Get page item names
+    lnms <- names(pg)
+
     for (i in seq_len(length(pg))) {
 
       brk <- FALSE
@@ -80,6 +84,9 @@ output_report <- function(lst,
 
       # Assign page data
       dt <- pg[[i]]
+
+      # Get item name
+      lnm <- lnms[i]
 
       if ("data.frame" %in% class(dt)) {
         if (viewer == TRUE) {
@@ -185,7 +192,23 @@ output_report <- function(lst,
         rpt <- add_content(rpt, fig, align = 'center', page_break = brk)
 
 
+      } else if ("plot_spec" %in% class(dt)) {
+
+        # Add plot content
+        rpt <- add_content(rpt, dt, align = 'center', page_break = brk)
+
+      } else if ("list" %in% class(dt)) {
+        if ("plot_spec" %in% class(dt[[1]])) {
+
+          for (pobj in dt) {
+
+            rpt <- add_content(rpt, pobj, align = 'center', page_break = brk)
+          }
+
+        }
+
       }
+
     } # Tables
 
 
@@ -221,6 +244,9 @@ output_report <- function(lst,
   return(ret)
 }
 
+# There are two test cases for this, but they can't be run with testthat
+# as part of a normal command check.  Have to run them interactively
+# in dev mode.
 #' @noRd
 show_viewer <- function(path) {
 
@@ -426,7 +452,7 @@ has_option <- function(options, name) {
 }
 
 
-get_option <- function(options, name, default = NULL) {
+get_option <- function(options, name, default = NULL, evl = TRUE) {
 
   ret <- NULL
 
@@ -443,7 +469,9 @@ get_option <- function(options, name, default = NULL) {
         names(options) <- tolower(nms)
         # See if name exists
         vl <- options[[tolower(name)]]
-        if (!is.null(vl)) {
+        if (evl == FALSE) {
+          ret <- gsub('"', "", vl, fixed = TRUE)
+        } else if (!is.null(vl)) {
           ret <- tryCatch(eval(str2expression(vl)),
                           error = function(cond){vl})
         }
@@ -470,7 +498,7 @@ get_option <- function(options, name, default = NULL) {
 
 }
 
-get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
+get_name <- function(nm = NULL, var = NULL, bylbl = NULL, addvar = FALSE) {
 
   vnm <- ""
 
@@ -478,6 +506,8 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
     vnm <- var
   else if (nchar(nm) == 0)
     vnm <- var
+  else if (addvar)
+    vnm <- paste0(nm, ": ", var)
   else
     vnm <- nm
 
@@ -565,27 +595,9 @@ has_report<- function(outpt) {
 
 }
 
-# Other Utilities ---------------------------------------------------------
+# Logging Utilities ---------------------------------------------------------
 
 
-fill_missing <- function(ds, num) {
-
-  nas <- rep(NA, num - 1)
-  nw <- list()
-
-  for (nm in names(ds)) {
-
-    nw[[nm]] <- nas
-  }
-
-  dfn <- as.data.frame(nw, stringsAsFactors = FALSE)
-
-  ret <- rbind(ds, nw)
-
-
-  return(ret)
-
-}
 
 # get_by_ds <- function(byvals) {
 #
@@ -633,6 +645,28 @@ log_output <- function() {
 #
 # }
 
+# Other Utilities ---------------------------------------------------------
+
+
+
+fill_missing <- function(ds, num) {
+
+  nas <- rep(NA, num - 1)
+  nw <- list()
+
+  for (nm in names(ds)) {
+
+    nw[[nm]] <- nas
+  }
+
+  dfn <- as.data.frame(nw, stringsAsFactors = FALSE)
+
+  ret <- rbind(ds, nw)
+
+
+  return(ret)
+
+}
 
 get_alpha <- function(opts) {
 
@@ -1063,3 +1097,494 @@ get_valid_obs <- function(data, formula) {
   return(ret)
 
 }
+
+# Remove factors from output data frames.
+# The factors are added by the order parameter to sort the class
+# values correctly.
+#' @noRd
+clear_factors <- function(res, class) {
+
+  # Clear out factors from output datasets
+  if (!is.null(class)) {
+    if (length(class) > 1) {
+      cvect <- paste0("CLASS", seq(1, length(class)))
+    } else {
+      cvect <- "CLASS"
+    }
+
+    for (cnm in cvect) {
+      for (nm in names(res)) {
+        if (grepl("Statistics", nm, fixed = TRUE)) {
+          if (is.factor(res[[nm]][[cnm]])) {
+            lbl <- attr(res[[nm]][[cnm]], "label")
+            res[[nm]][[cnm]] <- as.character(res[[nm]][[cnm]])
+            attr(res[[nm]][[cnm]], "label") <- lbl
+          }
+        }
+        if (grepl("ConfLimits", nm, fixed = TRUE)) {
+          if (is.factor(res[[nm]][[cnm]])) {
+            lbl <- attr(res[[nm]][[cnm]], "label")
+            res[[nm]][[cnm]] <- as.character(res[[nm]][[cnm]])
+            attr(res[[nm]][[cnm]], "label") <- lbl
+          }
+        }
+      }
+    }
+  }
+
+  return(res)
+
+}
+
+
+# Sassy-r NSE
+#' @noRd
+resolve_arg <- function(arg, type = c("character", "NULL")) {
+
+  call <- match.call()
+  if (!"arg" %in% names(call)) {
+    stop("Argument 'arg' is missing.", call. =  FALSE)
+  }
+
+  if (!is.character(type)) {
+    stop("'type' must be a character vector.", call. = FALSE)
+  }
+
+  valid_modes <- c("character", "double", "integer", "NULL")
+
+  if (!all(type %in% valid_modes)) {
+    stop("'type' must contain valid mode values.", call. = FALSE)
+  }
+
+  expr <- eval.parent(substitute(substitute(arg)))
+  expr_str <- paste(deparse(expr, width.cutoff = 500L), collapse = " ")
+
+  value <- tryCatch(arg, error = function(e) e)
+
+  res <- if (!inherits(value, "error") && typeof(value) %in% type) value else expr_str
+
+  return(res)
+}
+
+# Subset data
+#' @noRd
+subset_data <- function(data, where = NULL) {
+
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data.frame.", call. = FALSE)
+  }
+
+  if (is.null(where)) {
+    return(data)
+  }
+
+  if (!is.expression(where)) {
+    stop("'where' must be an expression.", call. = FALSE)
+  }
+
+  if (length(where) != 1L) {
+    stop("'where' must be an expression of length 1.", call. = FALSE)
+  }
+
+  rows <- tryCatch(
+    eval(where, envir = data),
+    error = function(e)
+      stop("Error evaluating 'where': ", e$message, call. = FALSE)
+  )
+
+  if (!is.logical(rows)) {
+    stop("'where' must evaluate to a logical vector.", call. = FALSE)
+  }
+
+  if (length(rows) != nrow(data)) {
+    stop("'where' must evaluate to a logical vector with length equal to nrow(data).", call. = FALSE)
+  }
+
+  res <- copy.attributes(data, data[rows, , drop = FALSE])
+
+  return(res)
+}
+
+
+# Binning Experiments -----------------------------------------------------
+
+
+
+# pretty_custom <- function(x, n = 7) {
+#   # Handle edge case: empty or constant vector
+#   if (length(x) == 0) return(numeric(0))
+#   rng <- range(x, na.rm = TRUE)
+#   if (rng[1] == rng[2]) return(rng[1])
+#
+#   # 1. Calculate the raw interval size
+#   raw_range <- rng[2] - rng[1]
+#   raw_step <- raw_range / (n - 1)
+#
+#   # 2. Normalize step to a value between 1 and 10 (base 10)
+#   magnitude <- 10^floor(log10(raw_step))
+#   normalized_step <- raw_step / magnitude
+#
+#   # 3. Choose the "nicest" snap point
+#   # Common 'pretty' steps are 1, 2, 2.5, 5, and 10
+#   nice_steps <- c(1, 2, 2.5, 5, 10)
+#   actual_step <- nice_steps[which.min(abs(nice_steps - normalized_step))] * magnitude
+#
+#   # 4. Find the start and end points (aligned with the step size)
+#   start <- floor(rng[1] / actual_step) * actual_step
+#   end <- ceiling(rng[2] / actual_step) * actual_step
+#
+#   # 5. Generate the sequence
+#   return(seq(from = start, to = end, by = actual_step))
+# }
+
+# pretty_centered <- function(x, n = 7) {
+#   if (length(x) == 0) return(numeric(0))
+#
+#   rng <- range(x, na.rm = TRUE)
+#   mu  <- mean(x, na.rm = TRUE)
+#
+#   # 1. Calculate the ideal step size to cover the range in ~n steps
+#   raw_range <- diff(rng)
+#   raw_step  <- raw_range / (n - 1)
+#
+#   # 2. Normalize step to "nice" intervals (1, 2, 2.5, 5, 10)
+#   magnitude <- 10^floor(log10(raw_step))
+#   normalized_step <- raw_step / magnitude
+#   nice_steps <- c(1, 2, 2.5, 5, 10)
+#   actual_step <- nice_steps[which.min(abs(nice_steps - normalized_step))] * magnitude
+#
+#   # 3. Center the 4th breakpoint at the "nice" value closest to the mean
+#   # This ensures the middle of our sequence is a clean number near the mean
+#   center_point <- round(mu / actual_step) * actual_step
+#
+#   # 4. Calculate how many steps we need to cover the data below and above the center
+#   # We want roughly (n-1)/2 steps on each side
+#   side_steps <- ceiling((n - 1) / 2)
+#
+#   # 5. Generate sequence centered on our nice mean-proxy
+#   breaks <- seq(
+#     from = center_point - (side_steps * actual_step),
+#     to   = center_point + (side_steps * actual_step),
+#     by   = actual_step
+#   )
+#
+#   # 6. Optional: Expand if the range isn't fully covered due to centering
+#   while(min(breaks) > rng[1]) breaks <- c(min(breaks) - actual_step, breaks)
+#   while(max(breaks) < rng[2]) breaks <- c(breaks, max(breaks) + actual_step)
+#
+#   return(breaks)
+# }
+
+
+
+# pretty_sas <- function(x, n = 7) {
+#
+#   # x <- c(-.8, 78)
+#
+#   rng <- range(x, na.rm = TRUE)
+#   mu  <- mean(x, na.rm = TRUE)
+#   dif <-  diff(rng)
+#   step <- dif / (n - 1)
+#
+#   magnitude <- 10^floor(log10(step))
+#   base <- magnitude / 2
+#   pstep <- base*ceiling(step/base)
+#
+#   bars <- ceiling(dif / pstep)
+#
+#   pbars <- seq(0, bars * pstep, pstep)
+#
+#   fbars <- pbars + rng[1]
+#
+#   ret <- base * floor(fbars/base)
+#
+#   return(ret)
+# }
+
+
+
+# Text Functions ----------------------------------------------------------
+
+
+
+#' @description Estimate number of wraps based on text, width, and a font.
+#' @import graphics
+#' @import withr
+#' @noRd
+get_text_width <- function(txt, font = "arial", font_size = 12,
+                           multiplier = .975) {
+
+
+  f <- "mono"
+  if (tolower(font) == "arial")
+    f <- "sans"
+  else if (tolower(font) == "times")
+    f <- "serif"
+
+  un <- "inches"
+
+  ret <- 0
+
+ withr::with_pdf(NULL, {
+   par(family = f, ps = font_size)
+   if (length(txt) > 0) {
+     ret <- strwdth(txt, un) * multiplier
+   }
+ })
+
+
+  return(ret)
+}
+
+# Vectorized function to calculate string width.
+# Error and warning handling is necessary because the string
+# may contain special characters which generate errors/warnings
+# in the strwidth() function.
+strwdth <- Vectorize(function(wrd, un) {
+
+  if (is.na(wrd)) {
+    ret <- 0
+  } else {
+
+    ret <- tryCatch({
+
+      suppressWarnings(strwidth(wrd, units = un))
+
+
+
+    }, error = function(cond) {
+
+      suppressWarnings(strwidth("a", units = un)) * nchar(wrd)
+
+    })
+  }
+
+  return(ret)
+}, USE.NAMES = FALSE, SIMPLIFY = TRUE)
+
+
+
+get_line_count <- function(vct, fs = 12) {
+
+  mxwdth <- 0
+
+  # Break by user-defined line feeds
+  spl <- strsplit(vct, "\n", fixed = TRUE)
+
+  for (idx in seq_along(spl)) {
+
+    ln <- spl[[idx]]
+
+    # Get widths of each item in vector
+    wdths <- get_text_width(ln, font_size = fs, multiplier = 1)
+
+    # Get max width
+    if (max(wdths) > mxwdth) {
+      mxwdth <- max(wdths)
+    }
+  }
+
+  # Estimate number of lines needed
+  # 5 is approximate number of lines per inch
+  ret <- mxwdth * 5
+
+  return(ret)
+
+}
+
+
+
+# Fit string to specified width, break lines as needed,
+# and return how many lines are required.
+# Also account for user-defined line breaks, and single words
+# that are too big to fit in available width.
+#' @noRd
+fit_width <- function(str, wdth) {
+
+  # browser()
+
+  # Return vector and line count
+  lst <- list()
+  mxlns <- 0
+
+  # Width of space. Needed below.
+  spc <- get_text_width(" ", font_size = 12, multiplier = .9)
+
+  # Get User-split sections
+  spl <- strsplit(str, "\n", fixed = TRUE)
+
+  # Vector loop
+  for (idx1 in seq_along(spl)) {
+
+    # Get segment
+    seg <- spl[[idx1]]
+
+    # Get width of segment
+    wseg <- get_text_width(seg, font_size = 12, multiplier = .9)
+
+    # One line of input vector
+    ln <- c()
+
+    # User-split loop
+    for (idx2 in seq_along(seg)) {
+
+      # If segment width is in bounds, just add it
+      if (wseg[idx2] <= wdth) {
+
+        ln <- append(ln, seg[idx2])
+      } else {
+
+        # browser()
+
+        # Break into words
+        wrds <- strsplit(seg[idx2], " ", fixed = TRUE)[[1]]
+
+        # Width of words.
+        wwrds <- get_text_width(wrds, font_size = 12, multiplier = .9)
+
+        ln2 <- c()
+        pos <- 1
+
+        for (idx3 in seq_along(wrds)) {
+
+          # Proposed sequence
+          psq <- seq(pos, idx3)
+
+          # Proposed width
+          tw <- sum(wwrds[psq]) + ((length(psq) - 1) * spc)
+
+          # Check proposed width
+          if (tw > wdth) {
+
+            # Even one word too big
+            if (idx3 - pos == 0) {
+
+              ln2 <- c(ln2, force_width(wrds[idx3], wdth))
+              pos <- idx3
+
+            } else {
+
+              ln2 <- c(ln2, paste(wrds[seq(pos, idx3 - 1)], collapse = " "))
+              pos <- idx3
+
+              if (idx3 == length(wrds)) {
+
+                # Append last section
+                if (wwrds[idx3] > wdth) {
+                  ln2 <- c(ln2, force_width(wrds[idx3], wdth))
+                } else {
+                  ln2 <- c(ln2, wrds[idx3])
+                }
+              }
+            }
+
+
+          } else if (idx3 == length(wrds)) {
+
+            # Append last section
+            ln2 <- c(ln2, paste(wrds[seq(pos, idx3)], collapse = " "))
+          }
+        }
+
+        ln <- append(ln, ln2)
+
+      }
+    }
+
+    # Update max lines
+    if (length(ln) > mxlns) {
+      mxlns <- length(ln)
+    }
+
+    # Append to return vector
+    lst[[length(lst) + 1]] <- ln
+
+  }
+
+  # Collapse list of vectors into single vector
+  vct <- c()
+  for (idx4 in seq_along(lst)) {
+
+    # Get vector
+    mvct <- lst[[idx4]]
+
+    # Add empty strings if needed
+    if (length(mvct) < mxlns) {
+      mvct <- append(mvct, rep("", mxlns - length(mvct)))
+    }
+
+    # Collapse to one string
+    ln <- paste0(mvct, collapse = "\n")
+    vct <- append(vct, ln)
+  }
+
+
+  ret <- list(Vector = vct, Lines = mxlns)
+
+
+  return(ret)
+}
+
+
+# Fit string to specified width, put ... if needed
+#' @noRd
+force_width <- function(str, wdth) {
+
+  # Split every character
+  spl <- strsplit(str, "", fixed = TRUE)
+
+  # Return vector
+  ret <- c()
+
+  for (idx in seq_along(spl)) {
+
+    # Get characters for one vector item
+    chrs <- spl[[idx]]
+
+    # Get width of each character
+    wdths <- get_text_width(chrs, font_size = 12, multiplier = .9)
+
+    # Get cumulative sum
+    cwdths <- cumsum(wdths)
+
+    # Figure out which characters are in bounds
+    ib <- cwdths <= wdth
+
+    # Determine if string needs truncating
+    if (all(ib == TRUE)) {
+      ret <- append(ret, str[idx])
+    } else {
+
+      # Filter out characters
+      tmp1 <- chrs[ib]
+
+      # Remove last three characters
+      if (length(tmp1) > 3) {
+        tmp2 <- tmp1[seq(1, length(tmp1) - 3)]
+      } else {
+        tmp2 <- tmp1
+      }
+
+      # Collapse into single string
+      tmp3 <- paste0(tmp2, collapse = "")
+
+      # Add dots
+      if (length(tmp1) > 3) {
+        tmp4 <- paste0(tmp3, "...")
+      } else {
+        tmp4 <- tmp3
+      }
+
+      # Append to return vector
+      ret <- append(ret, tmp4)
+
+    }
+
+  }
+
+
+  return(ret)
+}
+
+
+

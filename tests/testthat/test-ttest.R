@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <-  file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -1185,6 +1185,175 @@ test_that("ttest28: Data with no rows generates error.", {
 
 
 })
+
+
+test_that("ttest29: where parameter works as expected.", {
+
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     options = c(alpha = 0.1))
+
+  res2 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     options = c(alpha = 0.1),
+                     where = expression(Weight < 150))
+
+  expect_equal(res1$Statistics$N, c(9, 10, NA, NA))
+  expect_equal(res2$Statistics$N, c(9, 9, NA, NA))
+
+})
+
+test_that("ttest30: order parameter works as expected.", {
+
+
+  # Internal order - Default, also with NSE
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = internal)
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("F", "M"))
+
+
+  # Data output order
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "data")
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("M", "F"))
+
+  # Data report order
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     output = "report",
+                     order = "data")
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("M", "F"))
+
+
+  # Frequency order
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "freq")
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("M", "F"))
+
+
+
+  dat1 <- cls
+  formats(dat1) <- list(Sex = value(condition(x == "M", "Male"),
+                              condition(x == "F", "Female")))
+
+  #Formatted order
+  res1 <- proc_ttest(dat1,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "formatted")
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("Male", "Female"))
+
+
+  dat2 <- cls
+
+  dat2$Sex <- factor(dat2$Sex, levels = c("M", "F"))
+
+  #Factor order
+  res1 <- proc_ttest(dat2,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "internal")
+
+  expect_equal(as.character(res1$Statistics$CLASS[1:2]), c("M", "F"))
+
+  #Factor order
+  res1 <- proc_ttest(dat2,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "data")
+
+  expect_equal(as.character(res1$Statistics$CLASS[1:2]), c("M", "F"))
+
+
+  # Data order two variables
+  res1 <- proc_ttest(cls,
+                     var = c("Weight", "Height"),
+                     class = "Sex",
+                     order = "data")
+
+  expect_equal(res1$Statistics$CLASS[1:2], c("M", "F"))
+
+
+  # Parameter check single value
+  expect_error(proc_ttest(cls,
+                          var = c("Weight", "Height"),
+                          class = "Sex",
+                          order = "test"))
+
+
+  # Plot check - Long label
+  res1 <- proc_ttest(dat1,
+                     var = "Weight",
+                     output = "report",
+                     plots = c("summary", "boxplot"),
+                     class = "Sex",
+                     order = "formatted")
+
+
+  expect_equal("plot_spec" %in% class(res1$Plots$summary), TRUE)
+  expect_equal("plot_spec" %in% class(res1$Plots$boxplot), TRUE)
+
+
+  # Plot check - Short label
+  res1 <- proc_ttest(cls,
+                     var = "Weight",
+                     output = "report",
+                     plots = c("summary", "boxplot"),
+                     class = "Sex",
+                     order = "internal")
+
+
+  expect_equal("plot_spec" %in% class(res1$Plots$summary), TRUE)
+  expect_equal("plot_spec" %in% class(res1$Plots$boxplot), TRUE)
+
+})
+
+test_that("ttest31: log_ttest() works as expected.", {
+
+
+  # data,
+  # var = NULL,
+  # paired = NULL,
+  # output = NULL,
+  # by = NULL,
+  # class = NULL,
+  # # freq = NULL, ?
+  # # weight = NULL, ?
+  # options = NULL,
+  # titles = NULL,
+  # order = NULL,
+  # plots = NULL,
+  # where = NULL
+
+  res <- log_ttest(mtcars, by = "region", var = c("mpg", "cyl"),
+                   paired = "x * y",
+                   class = "z", plots = ttestplot(),
+                       where = expression(x == 1),
+                       options = "noname")
+
+  res
+
+  expect_equal(length(res), 8)
+
+})
+
+
+
+
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
 # test_that("ttest28: Paired ttest with lognormal data works.", {

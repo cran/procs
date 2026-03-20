@@ -178,3 +178,10 @@ knitr::opts_chunk$set(
 #  # 8 MODEL1 Weight   SEB    Weight   -1.0000000
 #  
 
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Shape wide
+#  res10 <- proc_reg(cls, Weight ~ Height,
+#                   plots = TRUE)
+#  
+#  
+

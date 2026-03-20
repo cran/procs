@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <-  file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -470,17 +470,32 @@ test_that("transpose19: Factor with unused level works.", {
 
 test_that("transpose20: log_transpose() works as expected.", {
 
+  # data,
+  # by = NULL,
+  # var = NULL,
+  # id = NULL,
+  # idlabel = NULL,
+  # copy = NULL,
+  # name = "NAME",
+  # namelabel = NULL,
+  # prefix = prefix,
+  # delimiter = delimiter,
+  # suffix = suffix,
+  # where = NULL,
+  # options = options,
+  # outdata = NULL
 
-  res <- log_transpose(mtcars, var = c("mpg", "cyl"),
+  res <- log_transpose(mtcars, by = "region", var = c("mpg", "cyl"),
                    id = c("n", "mean", "median"),
                    idlabel = c("n", "mean", "median"),
                    copy = "count", name = "sam", namelabel = "fork",
+                   prefix = "a_", suffix = "_b", delimiter = ".",
                    where = expression(x == 1),
-                   by = "cyl", outdata = mtcars)
+                   options = "noname", outdata = mtcars)
 
   res
 
-  expect_equal(length(res), 10)
+  expect_equal(length(res), 14)
 
 })
 
@@ -688,4 +703,29 @@ test_that("transpose29: parameter checks work.", {
   expect_error(proc_transpose(score, var = c("fork")))
 
 })
+
+test_that("transpose30: Standard Eval works on transpose", {
+
+  stats <- proc_means(datm, stats = v(n, mean, median),
+                      by = Layers,
+                      options = v(out, nonobs, notype))
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group", by = "BY",
+                         name = "STAT", id = "VAR")
+
+  res2
+
+  expect_equal(nrow(res2), 9)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+  expect_equal(names(res2), c("Group", "BY", "STAT", "Age",
+                              "PresentScore", "TasteScore"))
+
+
+})
+
 

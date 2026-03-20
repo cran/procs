@@ -156,7 +156,8 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 #  # Restore original data shape
-#  res2 <- proc_transpose(res, by = v(Name, Subject), id = NAME)
+#  res2 <- proc_transpose(res, by = v(Name, Subject),
+#                         id = NAME, options = noname)
 #  
 #  # View results
 #  res2[ , c("Name", "Subject", "Semester1", "Semester2")]
@@ -430,4 +431,91 @@ knitr::opts_chunk$set(
 #  # But now Subject is a character
 #  class(dat2$Subject)
 #  # [1] "character"
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Create input data with missing values
+#  dat2 <- read.table(header = TRUE, text = '
+#                    Name    Subject   Semester1  Semester2
+#                    Samma	  Maths	    96             94
+#                    Sandy	  English	  76             NA
+#                    Devesh	German	  76             95
+#                    Rakesh	Maths	    50             63
+#                    Priya	  English	  62             80
+#                    Kranti	Maths	    92             92
+#                    William	German	  87             75')
+#  
+#  # View dataset
+#  dat2
+#  #      Name Subject Semester1 Semester2
+#  # 1   Samma   Maths        96        94
+#  # 2   Sandy English        76        NA
+#  # 3  Devesh  German        76        95
+#  # 4  Rakesh   Maths        50        63
+#  # 5   Priya English        NA        80
+#  # 6  Kranti   Maths        92        92
+#  # 7 William  German        87        75
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Default sort on column with NA
+#  proc_sort(dat2, by = Semester2)
+#  #      Name Subject Semester1 Semester2
+#  # 4  Rakesh   Maths        50        63
+#  # 7 William  German        87        75
+#  # 5   Priya English        NA        80
+#  # 6  Kranti   Maths        92        92
+#  # 1   Samma   Maths        96        94
+#  # 3  Devesh  German        76        95
+#  # 2   Sandy English        76        NA
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Force NA to top
+#  proc_sort(dat2, by = Semester2, na.sort = "first")
+#  #      Name Subject Semester1 Semester2
+#  # 2   Sandy English        76        NA
+#  # 4  Rakesh   Maths        50        63
+#  # 7 William  German        87        75
+#  # 5   Priya English        NA        80
+#  # 6  Kranti   Maths        92        92
+#  # 1   Samma   Maths        96        94
+#  # 3  Devesh  German        76        95
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # NA still forced to top
+#  proc_sort(dat2, by = Semester2, order = "d", na.sort = "first")
+#  #      Name Subject Semester1 Semester2
+#  # 2   Sandy English        76        NA
+#  # 3  Devesh  German        76        95
+#  # 1   Samma   Maths        96        94
+#  # 6  Kranti   Maths        92        92
+#  # 5   Priya English        NA        80
+#  # 7 William  German        87        75
+#  # 4  Rakesh   Maths        50        63
+#  
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # Ascending sort
+#  proc_sort(dat2, by = Semester2, order = "a", na.sort = "sas")
+#  #      Name Subject Semester1 Semester2
+#  # 2   Sandy English        76        NA
+#  # 4  Rakesh   Maths        50        63
+#  # 7 William  German        87        75
+#  # 5   Priya English        NA        80
+#  # 6  Kranti   Maths        92        92
+#  # 1   Samma   Maths        96        94
+#  # 3  Devesh  German        76        95
+#  
+#  # Descending sort
+#  proc_sort(dat2, by = Semester2, order = "d", na.sort = "sas")
+#  #      Name Subject Semester1 Semester2
+#  # 3  Devesh  German        76        95
+#  # 1   Samma   Maths        96        94
+#  # 6  Kranti   Maths        92        92
+#  # 5   Priya English        NA        80
+#  # 7 William  German        87        75
+#  # 4  Rakesh   Maths        50        63
+#  # 2   Sandy English        76        NA
+#  
 

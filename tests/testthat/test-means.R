@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <- file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -75,9 +75,9 @@ test_that("means1: get_summaries works as expected for two variables.", {
 test_that("means2: gen_report_means works as expected with two variables.", {
 
   res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
-                    stats = c("n", "mean", "max", "min",
-                              "range", "median", "std"),
-                    titles = "My first title for Means")
+                          stats = c("n", "mean", "max", "min",
+                                    "range", "median", "std"),
+                          titles = "My first title for Means")
 
   res
 
@@ -118,10 +118,10 @@ test_that("means2: gen_report_means works as expected with two variables.", {
 test_that("means4: gen_report_means with two variables and by group.", {
 
   res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
-                    by = "Layers",
-                    stats = c("n", "mean", "max", "min",
-                              "range", "median", "std"),
-                    titles = "My first title for Means")
+                          by = "Layers",
+                          stats = c("n", "mean", "max", "min",
+                                    "range", "median", "std"),
+                          titles = "My first title for Means")
 
   res
 
@@ -136,10 +136,10 @@ test_that("means4: gen_report_means with two variables and by group.", {
 test_that("means5: gen_report_means with two variables and two by groups.", {
 
   res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
-                    by = c("Flavor", "Layers"),
-                    stats = c("n", "mean", "max", "min",
-                              "range", "median", "std"),
-                    titles = "My first title for Means")
+                          by = c("Flavor", "Layers"),
+                          stats = c("n", "mean", "max", "min",
+                                    "range", "median", "std"),
+                          titles = "My first title for Means")
 
   res
 
@@ -173,8 +173,8 @@ test_that("means6: get_summaries works as expected for two variables with v().",
 test_that("means7: gen_report_means with single parameter values.", {
 
   res <- gen_report_means(datm, var = "PresentScore",
-                    stats = "mean",
-                    titles = "My first title for Means")
+                          stats = "mean",
+                          titles = "My first title for Means")
 
   res
 
@@ -190,7 +190,7 @@ test_that("means8: proc_means with unquoted parameter values.", {
   res <- proc_means(datm, var = PresentScore,
                     stats = mean,
                     titles = "My first title for Means"
-                    )
+  )
 
   res
 
@@ -205,7 +205,7 @@ test_that("means8: proc_means with unquoted parameter values.", {
 test_that("means9: parameter checks work.", {
 
   expect_error(proc_means(datm, var = "Fork",
-                    stats = "mean"))
+                          stats = "mean"))
 
   expect_error(proc_means(datm, var = "PresentScore",
                           stats = "Fork"))
@@ -266,9 +266,9 @@ test_that("means12: proc_means in function works.", {
   myfunc <- function(myvar1, myvar2) {
 
     myres <- proc_means(datm, var = var1,
-                      stats = var2,
-                      titles = "My first title for Means",
-                      output = long)
+                        stats = var2,
+                        titles = "My first title for Means",
+                        output = long)
 
     return(myres)
   }
@@ -502,10 +502,10 @@ test_that("means22: gen_output_means works.", {
 
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
-          output = list(out1 = out_spec(stats = c("n", "mean", "min", "max"),
-                                   shape = "long"),
-                        out2 = out_spec(stats = c("n", "mean", "std"),
-                                   shape = "long")))
+                          output = list(out1 = out_spec(stats = c("n", "mean", "min", "max"),
+                                                        shape = "long"),
+                                        out2 = out_spec(stats = c("n", "mean", "std"),
+                                                        shape = "long")))
 
   res
 
@@ -527,9 +527,9 @@ test_that("means22: gen_output_means works.", {
 test_that("means23: get_class works.", {
 
   res <- get_class_report(datm, var = c("PresentScore", "TasteScore"),
-                   class = "Layers",
-                   outp = out_spec(stats = c("n", "mean", "min", "max"),
-                                 shape = "wide"))
+                          class = "Layers",
+                          outp = out_spec(stats = c("n", "mean", "min", "max"),
+                                          shape = "wide"))
 
 
   res
@@ -538,9 +538,9 @@ test_that("means23: get_class works.", {
 
 
   res <- get_class_output(datm, var = c("PresentScore", "TasteScore"),
-                   class = "Layers",
-                   outp = out_spec(stats = c("n", "mean", "min", "max"),
-                              shape = "wide"))
+                          class = "Layers",
+                          outp = out_spec(stats = c("n", "mean", "min", "max"),
+                                          shape = "wide"))
 
 
   res
@@ -557,9 +557,9 @@ test_that("means24: gen_output_means works.", {
                           var = c("PresentScore", "TasteScore"),
                           class = "Layers",
                           output = list(out1 = out_spec(stats = c("n", "mean", "min", "max"),
-                                                   shape = "long"),
+                                                        shape = "long"),
                                         out2 = out_spec(stats = c("n", "mean", "std"),
-                                                   shape = "long")))
+                                                        shape = "long")))
 
   res
 
@@ -618,7 +618,7 @@ test_that("means26: get_output with by works", {
   var2 <- c("n", "min", "max", "mean", "std")
 
   res <- get_output(datm, var = "PresentScore", stats = var2,
-             by = c("Layers" = 1), shape = "long")
+                    by = c("Layers" = 1), shape = "long")
   res
 
   expect_equal(nrow(res), 5)
@@ -633,7 +633,7 @@ test_that("means27: by parameter works.", {
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     by = "Layers",
-                  #  class = "Flavor",
+                    #  class = "Flavor",
                     titles = "My first title for Means",
                     output = long)
 
@@ -736,9 +736,9 @@ test_that("means32: get_class works with empty data frame.", {
   dftmp <- datm[datm$Layers == 42, ]
 
   res <- get_class_report(dftmp, var = c("PresentScore", "TasteScore"),
-                   class = "Layers",
-                   outp = out_spec(stats = c("n", "mean", "min", "max"),
-                              shape = "wide"))
+                          class = "Layers",
+                          outp = out_spec(stats = c("n", "mean", "min", "max"),
+                                          shape = "wide"))
 
 
   res
@@ -746,9 +746,9 @@ test_that("means32: get_class works with empty data frame.", {
   expect_equal(nrow(res), 2)
 
   res <- get_class_output(dftmp, var = c("PresentScore", "TasteScore"),
-                   class = "Layers",
-                   outp = out_spec(stats = c("n", "mean", "min", "max"),
-                              shape = "wide"))
+                          class = "Layers",
+                          outp = out_spec(stats = c("n", "mean", "min", "max"),
+                                          shape = "wide"))
 
 
   res
@@ -821,16 +821,31 @@ test_that("means35: Stacked output works.", {
 
 test_that("means36: log_means() works as expected.", {
 
+  # data,
+  # by = NULL,
+  # class = NULL,
+  # var = NULL,
+  # stats = NULL,
+  # output = NULL,
+  # weight = NULL,
+  # view = TRUE,
+  # titles = NULL,
+  # opts = NULL,
+  # where = NULL,
+  # outcnt = NULL
 
   res <- log_means(mtcars, var = c("mpg", "cyl"),
                    stats = c("n", "mean", "median"),
-                  weight = "count", titles = c("here is my big long title",
-                                               "Here is another title"),
-                  by = "cyl", class="disp", outcnt = 6)
+                   weight = "count", titles = c("here is my big long title",
+                                                "Here is another title"),
+                   output = "report",
+                   opts = c("nway", vardef = "DF"),
+                   where = expression(A == 1),
+                   by = "cyl", class="disp", outcnt = 6)
 
   res
 
-  expect_equal(length(res), 9)
+  expect_equal(length(res), 12)
 
 })
 
@@ -841,10 +856,10 @@ test_that("means37: warning on unknown parameter works.", {
   var2 <- c("n", "min", "max", "mean", "std")
 
   expect_error(proc_means(datm, var = var1,
-                    stats = var2,
-                    class = Layers,
-                    fork = TRUE,
-                    titles = "My first title for Means"))
+                          stats = var2,
+                          class = Layers,
+                          fork = TRUE,
+                          titles = "My first title for Means"))
 
 })
 
@@ -1217,7 +1232,7 @@ test_that("means49: factors work as expected.", {
                     stats = c("n", "min", "max", "mean", "std"),
                     output = c("out", "report", "long"),
                     by = "Region",
-                   #  class = c("Layers", "Flavor"),
+                    #  class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
                     options = c(maxdec = 4))
 
@@ -1279,8 +1294,8 @@ test_that("means50: two by as factors work.", {
 
 
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                    output = out,
-                    by = c("Layers", "Flavor"))
+                     output = out,
+                     by = c("Layers", "Flavor"))
 
   res1
 
@@ -1314,7 +1329,7 @@ test_that("means51: other statistics with by works.", {
                      output = out,
                      by = c("Layers"),
                      options = c(maxdec = 8)
-                     )
+  )
 
   res1
 
@@ -1329,13 +1344,21 @@ test_that("means51: other statistics with by works.", {
 
 
   # Not enough observations
-  expect_error(proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                     stats = c("kurt", "skew", "cv", "clm"),
+
+  res2 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("cv", "clm"),
                      output = out,
                      by = c("Layers"),
-                     class = "Flavor"))
+                     class = "Flavor",
+                     options = c(maxdec = 8)
+  )
 
-
+  res2
+  expect_equal(nrow(res2), 36)
+  expect_equal(ncol(res2), 8)
+  expect_equal(res2[7, 6], 28.2842712)
+  expect_equal(res2[7, 7], -88.6213545)
+  expect_equal(res2[7, 8], 203.6213545)
 
 })
 
@@ -1424,12 +1447,12 @@ test_that("means54: completetypes on one factor works.", {
   res
 
   res1 <- proc_means(datsp, var = var1,
-                    stats = var2,
-                    #by = "Layers",
-                    class = c("Flavor"),
-                    titles = "My first title for Means",
-                    options = "completetypes",
-                    output = c("out", "report"))
+                     stats = var2,
+                     #by = "Layers",
+                     class = c("Flavor"),
+                     titles = "My first title for Means",
+                     options = "completetypes",
+                     output = c("out", "report"))
 
   res1
 
@@ -1462,12 +1485,12 @@ test_that("means55: completetypes option on two factors works.", {
 
 
   res2 <- proc_means(datsp, var = var1,
-                    stats = var2,
-                    #by = "Layers",
-                    class = c("Layers", "Flavor"),
-                    titles = "My first title for Means",
-                    options = "completetypes",
-                    output = c("out", "report"))
+                     stats = var2,
+                     #by = "Layers",
+                     class = c("Layers", "Flavor"),
+                     titles = "My first title for Means",
+                     options = "completetypes",
+                     output = c("out", "report"))
 
   res2
 
@@ -1534,23 +1557,651 @@ test_that("means58: parameter checks work.", {
 })
 
 
-# res3 <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-#            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),
-#            options = v(maxdec = 4),
-#            titles = "Summary of Presentation and Taste Scores")
-#
-# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-#            stats = c("p1", "p5", "p10", "p20", "p25", "p30", "p40", "p50"),
-#            options = v(maxdec = 4),
-#            titles = "Summary of Presentation and Taste Scores")
-#
-# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-#            stats = c("p60", "p70", "p75", "p80", "p90", "p95", "p99"),
-#            options = v(maxdec = 4),
-#            titles = "Summary of Presentation and Taste Scores")
-# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-#            stats = c("q1", "q3", "qrange", "range", "sum", "uclm", "vari"),
-#            options = v(maxdec = 4),
-#            titles = "Summary of Presentation and Taste Scores")
+test_that("means59: vardef option works", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  #vardf = df
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "df"))
+  #vardf = n
+  res2 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "n"))
+  #vardf = wdf
+  res3 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     weight = Weight,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  #vardf = weight/wgt
+  res4 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     weight = Weight,
+                     options = v(notype, nofreq, nway, vardef = "wgt"))
+  res5 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     weight = Weight,
+                     options = v(notype, nofreq, nway, vardef = "weight"))
+
+  #STD
+  expect_equal(res1$STD[2], 9.3767630)
+  expect_equal(res2$STD[2], 9.1393381)
+  expect_equal(res3$STD[2], 9.3540353)
+  expect_equal(res4$STD[2], 9.2333330)
+  expect_equal(res5$STD[2], 9.2333330)
 
 
+
+  #vardf = wdf/weight when no weight variable specified
+  res6 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  res7 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "weight"))
+  expect_equal(res6$STD[2], 9.3767630)
+  expect_equal(res7$STD[2], 9.1393381)
+
+  #return NA for CLM, t, prt when vardef != df
+  res8 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("mean", "t", "clm","prt"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "n"))
+  expect_equal(is.na(res8$LCLM[2]), TRUE)
+  expect_equal(is.na(res8$UCLM[2]), TRUE)
+  expect_equal(is.na(res8$T[2]), TRUE)
+  expect_equal(is.na(res8$PRT[2]), TRUE)
+
+  #vardef = wdf when sum(weights)<=1
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)/100
+  res9 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     weight = Weight,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  expect_equal(res9$MEAN[1], 42.1282051)
+  expect_equal(is.na(res9$STD[1]), TRUE)
+
+  #invalid vardef option
+  expect_error( proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                           output = out,
+                           weight = Weight,
+                           options = v(notype, nofreq, nway, vardef = "abc")))
+})
+
+test_that("means60: Weight works for stats option: n nmiss nobs min max range sum", {
+
+  datsp <- data.frame(
+    x = c(10, NA, 40, 30, NA),
+    w = c(1, 2, NA, 1, 2)
+  )
+
+  #n nmiss nobs
+  res1 <- proc_means(datsp, var = c("x"),
+                     stats = c("n", "nmiss", "nobs", "min", "max", "range", "sum"),
+                     output = out,
+                     weight = "w")
+  res1
+  expect_equal(nrow(res1), 1)
+  expect_equal(ncol(res1), 10)
+  expect_equal(res1$N[1],2)
+  expect_equal(res1$NMISS[1], 2)
+  expect_equal(res1$NOBS[1], 5)
+  expect_equal(res1$MIN[1], 10)
+  expect_equal(res1$MAX[1], 30)
+  expect_equal(res1$RANGE[1], 20)
+  expect_equal(res1$SUM[1], 40)
+})
+
+
+test_that("means61: Weight available works for stats option: mean median mode", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  #n mean std
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "mean", "median", "mode"),
+                     output = out,
+                     weight = "Weight",
+                     by = c("Layers"),
+                     class = "Flavor")
+  res1
+  expect_equal(nrow(res1), 36)
+  expect_equal(ncol(res1), 9)
+  expect_equal(res1$MEAN[6],82.1111111)
+  expect_equal(res1$MEDIAN[6],83)
+  expect_equal(is.na(res1$MODE[6]),TRUE)
+
+  ##when missing weight is present
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,NA,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  res2 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "mean", "median", "mode"),
+                     output = out,
+                     weight = "Weight",
+                     by = c("Layers"),
+                     class = "Flavor")
+  res2
+  expect_equal(nrow(res2), 36)
+  expect_equal(ncol(res2), 9)
+  expect_equal(res2$MEAN[6],82.50)
+  expect_equal(res2$MEDIAN[6],83)
+  expect_equal(is.na(res1$MODE[6]),TRUE)
+})
+
+test_that("means62: Weight works for stats option: quantiles, qrange", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
+                               "p50", "p60", "p70", "p75", "p80", "p90",
+                               "p95", "p99", "q1", "q3", "qrange"),
+                     output = out,
+                     weight = "Weight",)
+  res1
+
+  expect_equal(nrow(res1), 3)
+  expect_equal(ncol(res1), 22)
+  expect_equal(as.numeric(res1[1,5:ncol(res1)]),c(19,23,26,28,32,33,36,42,46,51,
+                                                  55,55,62,69,69,32,55,23))
+})
+
+test_that("means63: Weight works for stats option: css cv std stderr uss vari", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "css", "cv", "std", "stderr", "uss", "vari"),
+                     output = out,
+                     weight = "Weight",)
+  res1
+
+  expect_equal(nrow(res1), 3)
+  expect_equal(ncol(res1), 10)
+  expect_equal(as.numeric(res1[1,5:ncol(res1)]),c(7080.358974359,45.822405222,
+                                    19.304156867, 3.091139,76297,372.650472335))
+})
+
+test_that("means64: Weight works for stats option: t clm uclm lclm prt probt", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "t", "clm", "uclm", "lclm", "prt", "probt"),
+                     output = out,
+                     weight = "Weight")
+  res1
+
+  expect_equal(nrow(res1), 3)
+  expect_equal(ncol(res1), 9)
+  expect_equal(as.numeric(res1[1,5:7]),c(13.62869969, 35.658376846,48.598033410))
+})
+
+test_that("means64: Weight works for stats option: skew kurt", {
+
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n", "skew", "kurt"),
+                     output = out,
+                     weight = "Weight")
+  res1
+  #expect NA
+  expect_equal(nrow(res1), 3)
+  expect_equal(ncol(res1), 6)
+  expect_equal(is.na(res1[1,5]),TRUE)
+  expect_equal(is.na(res1[1,6]),TRUE)
+})
+
+test_that("means66: Vardef with Weight", {
+
+  #vardef = wdf/weight when no weight variable specified
+  datsp <- datm
+  res <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  res
+
+  expect_equal(res$STD[2], 9.3767630)
+  expect_equal(res$MEAN[2], 76.15)
+
+})
+
+test_that("means67: Some other cases with Weight", {
+
+  #weight variable is not in data
+  datsp <- datm
+  expect_error(proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("n"),
+                     output = out,
+                     weight = "Weight"))
+
+  #non-numeric weight variable
+  expect_error(proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                          stats = c("n"),
+                          output = out,
+                          weight = "Flavor"))
+
+  # contains negative and zero weights
+  datsp$Weight <- c(1,0,3,1,2,3,1,2,-1,1,2,3,-2,2,3,0,2,-3,1,2)
+
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean"))
+  res
+
+  expect_equal(res$N[1], 20)
+  expect_equal(res$MEAN[1], 45.379310)
+
+  # all weights are NA
+  datsp$Weight <- NA_real_
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max"))
+  res
+  expect_equal(res$N[1], 0)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(is.na(res$MIN[1]), TRUE)
+
+  # all weights are zero or negative
+  datsp$Weight <- c(-1,0,-3,-1,-2,-3,-1,-2,-1,-1,-2,-3,-2,-2,-3,0,-2,-3,-1,-2)
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max","median"))
+  res
+  expect_equal(res$N[1], 20)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(res$MIN[1], 19)
+})
+
+
+test_that("means67: Vardef options with weight and class work as expected.", {
+
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          84      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3           0      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          95      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      0.05
+                Wang      Final          96      0.45')
+
+  # No weight - OK
+  res1 <- proc_means(dat2, var = Score, # weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(58.166666667, 96.83333333))
+  expect_equal(as.numeric(res1$MEDIAN), c(73.0, 97.0))
+  expect_equal(as.numeric(res1$STD), c(37.6797912, 5.9805239))
+  expect_equal(as.numeric(res1$VARI), c(1419.766666667, 35.766666667))
+
+  # Default - No vardef option. OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(10.7053958, 1.3876239))
+  expect_equal(as.numeric(res1$VARI), c(114.60550, 1.92550))
+
+  # vardef = wgt - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(23.9379928, 3.1028213))
+  expect_equal(as.numeric(res1$VARI), c(573.0275, 9.62750))
+
+
+  # vardef = df  - * Error here
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(10.7053958, 1.3876239))
+  expect_equal(as.numeric(res1$VARI), c(114.60550, 1.92550))
+
+  # vardef = wdf - No variance stats.  No std. OK.
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wdf", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$VARI), as.numeric(c(NA, NA)))
+
+
+  # vardef = n  - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "n", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(9.7726446, 1.2667215))
+  expect_equal(as.numeric(res1$VARI), c(95.5045833, 1.6045833))
+
+})
+
+
+# More comparisons to SAS
+test_that("means68: Vardef options with other statistics work as expected.", {
+
+  # NAs in Score and Weight
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          85      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3          NA      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          96      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      NA
+                Wang      Final          96      0.45')
+
+  # No weight - OK
+  res1 <- proc_means(dat2, var = Score, # weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70, 97))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85, 96.0))
+  expect_equal(as.numeric(res1$STD), c(27.6947648, 5.9329588))
+  expect_equal(as.numeric(res1$VARI), c(767.0, 35.2))
+  expect_equal(as.numeric(res1$STDERR), c(12.3854754, 2.4221203))
+  expect_equal(as.numeric(res1$LCLM), c(35.6124075, 90.7737416))
+  expect_equal(as.numeric(res1$UCLM), c(104.3875925, 103.2262584))
+  expect_equal(as.numeric(res1$CV), c(39.5639498, 6.1164524))
+
+  # Weight - No vardef
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
+  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STD), c(7.6637390, 1.0406223))
+  expect_equal(as.numeric(res1$VARI), c(58.7328947, 1.0828947))
+  expect_equal(as.numeric(res1$STDERR), c(7.8628303, 1.0676559))
+  expect_equal(as.numeric(res1$LCLM), c(62.5903360, 94.4567645))
+  expect_equal(as.numeric(res1$UCLM), c(106.2517692, 100.3853407))
+  expect_equal(as.numeric(res1$CV), c(9.0779950, 1.0681698))
+
+  # vardef = wgt - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
+  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STD), c(15.7256605, 2.1353119))
+  expect_equal(as.numeric(res1$VARI), c(247.2963989, 4.5595568))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(18.6276527, 2.1918382))
+
+
+  # Weight - vardef = DF
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "DF", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
+  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STD), c(7.6637390, 1.0406223))
+  expect_equal(as.numeric(res1$VARI), c(58.7328947, 1.0828947))
+  expect_equal(as.numeric(res1$STDERR), c(7.8628303, 1.0676559))
+  expect_equal(as.numeric(res1$LCLM), c(62.5903360, 94.4567645))
+  expect_equal(as.numeric(res1$UCLM), c(106.2517692, 100.3853407))
+  expect_equal(as.numeric(res1$CV), c(9.0779950, 1.0681698))
+
+  # vardef = wdf - No variance stats.  No std. OK.
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wdf", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
+  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STD), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$VARI), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), as.numeric(c(NA, NA)))
+
+
+  # vardef = n  - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "n", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
+  expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
+  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$STD), c(6.8546565, 0.9307609))
+  expect_equal(as.numeric(res1$VARI), c(46.9863158, 0.8663158))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(8.1196056, 0.9554001))
+
+})
+
+
+
+# More comparisons to SAS
+test_that("means69: Vardef options with other statistics no weight work as expected.", {
+
+  # NAs in Score and Weight
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          85      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3          NA      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          96      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      NA
+                Wang      Final          96      0.45')
+
+
+
+  # vardef = wgt - OK
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(24.7709507, 5.4160256))
+  expect_equal(as.numeric(res1$VARI), c(613.60, 29.3333333))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(35.3870725, 5.5835315))
+
+
+  # Weight - vardef = DF
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "DF", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(27.6947648, 5.9329588))
+  expect_equal(as.numeric(res1$VARI), c(767.0, 35.2))
+  expect_equal(as.numeric(res1$STDERR), c(12.3854754, 2.4221203))
+  expect_equal(as.numeric(res1$LCLM), c(35.6124075, 90.7737416))
+  expect_equal(as.numeric(res1$UCLM), c(104.3875925, 103.2262584))
+  expect_equal(as.numeric(res1$CV), c(39.5639498, 6.1164524))
+
+  # vardef = wdf - OK.
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wdf", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(27.6947648, 5.9329588))
+  expect_equal(as.numeric(res1$VARI), c(767.0, 35.2))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(39.5639498, 6.1164524))
+
+
+  # vardef = n  - OK
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "n", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(24.7709507, 5.4160256))
+  expect_equal(as.numeric(res1$VARI), c(613.60, 29.3333333))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(35.3870725, 5.5835315))
+
+
+})
+
+# T, P, etc. with vardef options
+# More comparisons to SAS
+test_that("means70: Vardef options with other statistics no weight work as expected.", {
+
+  # NAs in Score and Weight
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          85      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3          NA      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          96      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      NA
+                Wang      Final          96      0.45')
+
+
+
+  # Default - no weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$P10), c(25.0, 87.0))
+  expect_equal(as.numeric(res1$P25), c(62.0, 96.0))
+  expect_equal(as.numeric(res1$P75), c(85.0, 100))
+  expect_equal(as.numeric(res1$P90), c(93.0, 105.0))
+  expect_equal(as.numeric(res1$`T`), c(5.651781457, 40.047556956))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), c(0.004828366, 0.000000183))
+  expect_equal(as.numeric(res1$SKEW), c(-1.4264271, -0.6636655))
+  expect_equal(as.numeric(res1$KURT), c(1.5314803, 1.7610408))
+
+
+
+  # DF - with weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     weight = Weight,
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$P10), c(62, 96))
+  expect_equal(as.numeric(res1$P25), c(85, 96))
+  expect_equal(as.numeric(res1$P75), c(93, 98))
+  expect_equal(as.numeric(res1$P90), c(93, 100))
+  expect_equal(as.numeric(res1$`T`), c(10.736725813, 91.247610199))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), c(0.000426537, 0.000000086))
+  expect_equal(as.numeric(res1$SKEW), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$KURT), as.numeric(c(NA, NA)))
+
+
+  # Default - no weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     weight = Weight,
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$P10), c(62, 96))
+  expect_equal(as.numeric(res1$P25), c(85, 96))
+  expect_equal(as.numeric(res1$P75), c(93, 98))
+  expect_equal(as.numeric(res1$P90), c(93, 100))
+  expect_equal(as.numeric(res1$`T`), as.numeric(c(NA, NA)))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$SKEW), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$KURT), as.numeric(c(NA, NA)))
+
+})
+
+test_that("means71: where expression works as expected.", {
+
+  res <- proc_means(datm, var = "Age")
+
+
+  expect_equal(res$N, 20)
+
+
+  res <- proc_means(datm, var = "Age",
+                    where = expression(Age < 65))
+
+  expect_equal(res$N, 19)
+
+})

@@ -300,10 +300,11 @@ the corresponding SAS® procedures.</p>
 <div id="nway" class="section level3">
 <h3>Can you do N-way tables?</h3>
 <p><strong>Q:</strong> I see you can do one-way and two-way frequency
-tables. What about N-way tables? Does that package support them?</p>
+tables. What about N-way tables? Does the package support them?</p>
 <p><strong>A:</strong> No. N-way tables are less common, and were not
 seen as a priority. These types of tables are on the list for a future
-enhancement.</p>
+enhancement. The package does support 2-way frequency tables with one or
+more by variables.</p>
 <p><a href="#top">top</a></p>
 <hr />
 </div>
@@ -311,9 +312,12 @@ enhancement.</p>
 <h3>Can these procedures create plots?</h3>
 <p><strong>Q:</strong> I’m trying to find the option to produce a plot,
 and can’t find it. Does the package support plots or not?</p>
-<p><strong>A:</strong> Not yet. Plots are expected for a future release.
-In the meantime, you can send the output results into <a href="https://ggplot2.tidyverse.org/">ggplot2</a> and create the plots
-on your own.</p>
+<p><strong>A:</strong> Yes. As of <strong>procs</strong> version 1.0.8,
+the <code>proc_freq()</code>, <code>proc_ttest()</code>, and
+<code>proc_reg()</code> functions produce plots. To get a default set of
+plots, set <code>plots = TRUE</code> for the desired function. The
+documentation for each function has more information on the types of
+charts that can be produced, and various options.</p>
 <p><a href="#top">top</a></p>
 <hr />
 </div>
@@ -372,9 +376,14 @@ the <a href="https://reporter.r-sassy.org/">reporter</a> package.</p>
 always order the categories alphabetically. But I have a specific order
 in mind that is not alphabetical. Is there a way to order the frequency
 categories in a specific way?</p>
-<p><strong>A:</strong> Yes. If your frequency variable is defined as a
-factor, the <code>proc_freq()</code> function will order the frequency
-categories by that factor. Here is an example:</p>
+<p><strong>A:</strong> Yes. The <code>order</code> parameter on
+<code>proc_freq()</code> allows you to order your frequencies in four
+different ways: internal order (the default), data order, format order,
+or frequency order. See the <code>proc_freq()</code> documentation on
+the specific keywords needed to control the order.</p>
+<p>Also note that if your frequency variable is defined as a factor, the
+<code>proc_freq()</code> function will order the frequency categories by
+that factor. Here is an example:</p>
 <pre><code>library(procs)
 
 # Turn off printing for CRAN checks

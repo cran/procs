@@ -40,27 +40,10 @@ out_spec <- function(stats = NULL,
                 shape = NULL, report = FALSE, where = NULL,
                 drop = NULL, keep = NULL, rename = NULL,
                 format = NULL, label = NULL, table = NULL, var = NULL, varlbl = NULL,
-                formula = NULL,
+                formula = NULL, plots = NULL, class = NULL,
                 ...) {
 
   ret <- structure(list(), class = c("out_req", "list"))
-
-  # Single var NSE
-  ostats <- deparse(substitute(stats, env = environment()))
-  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                 error = function(cond) {ostats})
-
-  odrop <- deparse(substitute(drop, env = environment()))
-  drop <- tryCatch({if (typeof(drop) %in% c("character", "NULL")) drop else odrop},
-                 error = function(cond) {odrop})
-
-  okeep <- deparse(substitute(keep, env = environment()))
-  keep <- tryCatch({if (typeof(keep) %in% c("character", "NULL")) keep else okeep},
-                   error = function(cond) {okeep})
-
-  otable <- deparse(substitute(table, env = environment()))
-  table <- tryCatch({if (typeof(table) %in% c("character", "NULL")) table else otable},
-                   error = function(cond) {otable})
 
 
   ret$stats <- stats
@@ -77,36 +60,11 @@ out_spec <- function(stats = NULL,
   ret$var <- var
   ret$varlbl <- varlbl
   ret$formula <- formula
+  ret$plots <- plots
+  ret$class <- class
 
   return(ret)
 }
 
 
-# @title Specifies options
-# @description The \code{output} function is a generic options collection.
-# Used on multiple functions and parameters.
-# @details Here is some details
-# @param ... Various options.
-# @return An options class with the requested options.
-# opts <- function(...) {
-#
-#   ret <- tryCatch({
-#           if (typeof(...) == "list")
-#              structure(..., class = c("opts", "list"))
-#
-#          }, error = function(cond) {
-#
-#           structure(list(...), class = c("opts", "list"))
-#         })
-#
-#   # if (typeof(...) == "list") {
-#   #   ret <- structure(..., class = c("opts", "list"))
-#   # } else {
-#   #
-#   #   ret <- structure(list(...), class = c("opts", "list"))
-#   # }
-#
-#
-#   return(ret)
-#
-# }
+

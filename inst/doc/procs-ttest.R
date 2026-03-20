@@ -261,3 +261,11 @@ knitr::opts_chunk$set(
 #  # 6 Weight PROBT  2.754086e-06
 #  
 
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+#  # One sample T-Test with plots
+#  proc_ttest(cls, var = Height, options = c(h0 = 65),
+#             plots = ttestplot(c("summary", "qqplot", "interval"),
+#                               showh0 = TRUE))
+#  
+#  
+
