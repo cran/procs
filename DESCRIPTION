@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
 Title: Recreates Some 'SAS®' Procedures in 'R'
-Version: 1.0.8
+Version: 1.0.9
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
@@ -51,7 +51,7 @@ VignetteBuilder: knitr
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2026-03-20 02:59:11 UTC; dbosa
+Packaged: 2026-05-29 00:24:17 UTC; dbosa
 Author: David Bosak [aut, cre],
   Diyu Yang [aut],
   Athenkosi Nkonyeni [aut],
@@ -60,4 +60,4 @@ Author: David Bosak [aut, cre],
   Duong Tran [ctb],
   Yifei Chen [ctb]
 Repository: CRAN
-Date/Publication: 2026-03-20 06:10:24 UTC
+Date/Publication: 2026-05-29 06:20:03 UTC

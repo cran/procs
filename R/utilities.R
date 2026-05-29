@@ -62,15 +62,26 @@ output_report <- function(lst,
 
   }
 
+  # If everything thrown on one page, flatten
+  # the list to make it easier to deal with different objects.
+  if (pages == 1) {
+
+    nlst <- flatten_list(lst)
+
+  } else {
+
+    nlst <- lst
+
+  }
+
 
   for (j in seq_len(pages)) {
 
-
     if (pages == 1) {
-      pg <- lst
+      pg <- nlst
 
     } else {
-      pg <- lst[[j]]
+      pg <- nlst[[j]]
     }
 
     # Get page item names
@@ -242,6 +253,49 @@ output_report <- function(lst,
 
 
   return(ret)
+}
+
+
+flatten_list <- function(lst) {
+
+  nlst <- list()
+  idx <- c(1)
+  lvl <- 1
+  obj <- NULL
+  while(TRUE) {
+    tmp <- lst
+    for (i in seq(1, lvl)) {
+      if (idx[i] <= length(tmp)) {
+        tmp <- tmp[[idx[i]]]
+      } else {
+        tmp <- NULL
+      }
+    }
+    if (is.null(tmp)) {
+      if (lvl == 1) {
+        break
+      } else {
+        lvl <- lvl - 1
+        idx <- idx[seq(1, lvl)]
+      }
+    } else if (all(class(tmp) == "list")) {
+      lvl <- lvl + 1
+    } else {
+
+      nlst[[length(nlst) + 1]] <- tmp
+    }
+
+
+    if (is.na(idx[lvl])) {
+      idx[lvl] <- 1
+    } else {
+      idx[lvl] <- idx[lvl] + 1
+    }
+  }
+
+
+  return(nlst)
+
 }
 
 # There are two test cases for this, but they can't be run with testthat
@@ -1368,6 +1422,10 @@ get_line_count <- function(vct, fs = 12) {
 
   mxwdth <- 0
 
+  if ("factor" %in% class(vct)) {
+    vct <- as.character(vct)
+  }
+
   # Break by user-defined line feeds
   spl <- strsplit(vct, "\n", fixed = TRUE)
 
@@ -1402,6 +1460,10 @@ get_line_count <- function(vct, fs = 12) {
 fit_width <- function(str, wdth) {
 
   # browser()
+
+  if (is.character(str) == FALSE) {
+    str <- as.character(str)
+  }
 
   # Return vector and line count
   lst <- list()

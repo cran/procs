@@ -439,6 +439,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   dvr <- vrs$dvar
   ivr <- vrs$ivar
 
+  # Remove rows with NAs
+  datclean <- remove_na_rows(dat, dvr, ivr)
+
   # Set margins
   par(mfrow = c(3, 3),
       mar = c(2, 2, 1, 0) + 0.1,
@@ -606,7 +609,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
     lldt <- ldt[lblids]
 
     # Assign labels
-    text(lldt, lrdt, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lldt, lrdt, labels = lbls, pos = 3)
+    }
   }
 
   #******************************
@@ -659,7 +664,7 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   #******************************
 
   # Prepare data
-  odt <- dat[[dvr]]
+  odt <- datclean[[dvr]]
   pdt <- res$OutputStatistics$PREVAL
 
   # Set margins
@@ -773,7 +778,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
     # lcol <- cols[cols != nc]
 
     # Assign labels
-    text(lxcd, lcd, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lxcd, lcd, labels = lbls, pos = 3)
+    }
   }
 
 
@@ -1156,6 +1163,9 @@ render_residuals <- function(dat, res, mdl) {
 
   # Get residuals
   rdt <- res$OutputStatistics$RESID
+
+  # Remove rows with NAs
+  dat <- remove_na_rows(dat, dvr, ivr)
 
   # Split independent variables by panel
   if (length(ivr) > pnlmx) {
@@ -1556,7 +1566,9 @@ render_rstudentbyleverage <- function(dat, res, mdl, plt) {
     lcol <- cols[cols != nc]
 
     # Assign labels
-    text(lldt, lrdt, labels = lbls, pos = 3, col = lcol)
+    if (length(lbls) > 0) {
+      text(lldt, lrdt, labels = lbls, pos = 3, col = lcol)
+    }
   }
 
   # Frame
@@ -1634,7 +1646,8 @@ render_fitplot <- function(dat, res, mdl, plt, alph) {
     fit <- lm(mdl, data = dat)
 
     # Prediction grid
-    xnew <- seq(min(dat[[ivr]]), max(dat[[ivr]]), length.out = 200)
+    xnew <- seq(min(dat[[ivr]], na.rm = TRUE), max(dat[[ivr]], na.rm = TRUE),
+                length.out = 200)
 
     # Create data frame
     df1 <- data.frame(xnew)
@@ -1788,6 +1801,11 @@ render_residualhistogram <- function(dat, res, mdl, plt) {
   n   <- length(rdt)
   mu  <- mean(rdt)
   sdx <- sd(rdt)
+
+
+  # Calculate breaks - Closer to SAS algorithm
+  # brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+  #                min.n = 1, high.u.bias = 3)
 
   # Calculate breaks - Closer to SAS algorithm
   brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
@@ -2032,20 +2050,20 @@ render_rfplot <- function(dat, res, mdl) {
   p <- (seq_len(n) - 0.5) / n
 
   ## Left panel: Fit Mean
-  fit_centered <- sort(fdt - mean(fdt))
+  fit_centered <- sort(fdt - mean(fdt, na.rm = TRUE))
 
   ## Right panel: Residuals
   res_sorted <- sort(rdt)
 
   # Get y scale
   smin <- min(fit_centered)
-  if (min(res_sorted) < smin) {
-    smin <- min(res_sorted)
+  if (min(res_sorted, na.rm = TRUE) < smin) {
+    smin <- min(res_sorted, na.rm = TRUE)
   }
 
-  smax <- max(fit_centered)
-  if (min(res_sorted) > smax) {
-    smax <- max(res_sorted)
+  smax <- max(fit_centered, na.rm = TRUE)
+  if (min(res_sorted, na.rm = TRUE) > smax) {
+    smax <- max(res_sorted, na.rm = TRUE)
   }
 
   # Finalize y scale
@@ -2212,7 +2230,9 @@ render_cooksd <- function(dat, res, mdl, plt) {
     lxcd <- xcd[lblids]
 
     # Assign labels
-    text(lxcd, lcd, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lxcd, lcd, labels = lbls, pos = 3)
+    }
   }
 
   # Restore margins
@@ -2254,6 +2274,9 @@ render_observedbypredicted <- function(dat, res, mdl, plt) {
   vrs <- get_vars(mdl)
   dvr <- vrs$dvar
   ivr <- vrs$ivar
+
+  # Remove rows with NAs
+  dat <- remove_na_rows(dat, dvr, ivr)
 
   # Prepare data
   odt <- dat[[dvr]]
@@ -2383,7 +2406,7 @@ render_residualboxplot <- function(dat, res, mdl, plt) {
 
 
   # Mean diamond
-  points(1, mean(rdt),
+  points(1, mean(rdt, na.rm = TRUE),
          pch = 5,          # diamond
          col = "#05379B",
          cex = 1.3)
@@ -2602,9 +2625,9 @@ render_dfbetas <- function(dat, res, mdl, plt) {
 
   # Get yscale - Consistent Y scale on panel plot
   if (plt$label) {
-    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.2 # Give more room for labels
+    yscl <- c(min(dfb, -cutoff, na.rm = TRUE), max(dfb, cutoff, na.rm = TRUE)) * 1.2 # Give more room for labels
   } else {
-    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.1
+    yscl <- c(min(dfb, -cutoff, na.rm = TRUE), max(dfb, cutoff, na.rm = TRUE)) * 1.1
   }
 
   # Get xscale
@@ -2914,7 +2937,7 @@ draw_stats_box <- function(stats,
   box_h <- inner_h + 2 * py
 
   # center vertically in plot area
-  y_mid <- mean(usr[3:4])
+  y_mid <- mean(usr[3:4], na.rm = TRUE)
   y_bot <- y_mid - box_h / 2
   y_top <- y_mid + box_h / 2
 
@@ -2938,7 +2961,7 @@ draw_stats_box <- function(stats,
 
 get_scale <- function(vct, pct = .1, h0 = NULL) {
 
-  rng <- range(vct)
+  rng <- range(vct, na.rm = TRUE)
 
   if (!is.null(h0)) {
     if (h0 < rng[1]) {
@@ -2949,10 +2972,16 @@ get_scale <- function(vct, pct = .1, h0 = NULL) {
     }
 
   }
-
-  mn <- rng[1] * (1 - pct)
-  mx <- rng[2] * (1 + pct)
-
+  if (rng[1]>0){
+    mn <- rng[1] * (1 - pct)
+  } else{
+    mn <- rng[1] * (1 + pct)
+  }
+  if (rng[2]>0){
+    mx <- rng[2] * (1 + pct)
+  } else{
+    mx <- rng[2] * (1 - pct)
+  }
   ret <- c(mn, mx)
 
   return(ret)
@@ -2962,12 +2991,12 @@ get_scale <- function(vct, pct = .1, h0 = NULL) {
 
 get_zero_scale <- function(vct, pct = .1) {
 
-  rng <- range(vct)
+  rng <- range(vct, na.rm = TRUE)
 
   mn <- abs(rng[1] * (1 + pct))
   mx <- abs(rng[2] * (1 + pct))
 
-  tmx <- max(mn, mx)
+  tmx <- max(mn, mx, na.rm = TRUE)
 
   ret <- c(-tmx, tmx)
 
@@ -2984,14 +3013,14 @@ get_reg_xlim <- function(brks, mu, sdx,
                          max_sigma = 6) {
 
   # Get range of calculated breaks
-  rng  <- range(brks)
+  rng  <- range(brks, na.rm = TRUE)
 
   # Add adding on bin range
   pad0 <- pad_frac * diff(rng)
   xlim <- c(rng[1] - pad0, rng[2] + pad0)
 
   # Force symmetry around zero (expand, never shrink)
-  m <- max(abs(xlim))
+  m <- max(abs(xlim), na.rm = TRUE)
   xlim <- c(-m, m)
 
   if (!is.finite(sdx) || sdx <= 0) return(xlim)
@@ -3011,6 +3040,24 @@ get_reg_xlim <- function(brks, mu, sdx,
   }
 
   ret <- xlim - c(-0.5 * sdx, 0.5 * sdx)  # xlim[seq(2, length(xlim) - 1)]
+
+  return(ret)
+}
+
+remove_na_rows <- function(dat, dvr, ivrs) {
+
+  # Determine rows with NAs
+  dvna <- is.na(dat[[dvr]])
+
+  ivna <- rep(FALSE, nrow(dat))
+  for (var in ivrs) {
+    ivna <- ivna | is.na(dat[[var]])
+  }
+
+  cvna <- dvna | ivna
+
+  # Strip any such rows
+  ret <- dat[!cvna, ]
 
   return(ret)
 }

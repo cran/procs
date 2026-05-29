@@ -12,6 +12,8 @@ proc_ttest(
   output = NULL,
   by = NULL,
   class = NULL,
+  freq = NULL,
+  weight = NULL,
   options = NULL,
   titles = NULL,
   order = NULL,
@@ -68,11 +70,30 @@ variable "Group".  Note that
 there can only be two different values on the class variable.  Also, the
 analysis is restricted to only one class variable.}
 
+\item{freq}{The name of a variable to use for integer frequency counts.
+This parameter is optional, and NULL by default. When supplied, each row
+is treated as if it were repeated by the value of the freq variable for
+the purposes of computing the mean, variance, standard error, t statistic,
+and confidence limits. Frequency values must be non-negative integers.
+Observations with a missing or zero freq value are excluded from the
+analysis.}
+
+\item{weight}{The name of a variable to use for weighted statistics.
+This parameter is optional, and NULL by default. When supplied, the
+mean, variance, standard error, t statistic, and confidence limits are
+computed using the weights. Observations with a missing or non-positive
+weight are excluded from the analysis. The \code{freq} and \code{weight}
+parameters may be used together; in that case each observation is
+replicated by its frequency and weighted by its weight.}
+
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"h0 =", and "noprint". The "alpha = " option will set the alpha
+"h0 =", "sides =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
 The "h0 = " option sets the baseline hypothesis value for single-variable
-hypothesis testing.  The "noprint" option turns off the interactive report.}
+hypothesis testing. The "sides = " option selects a two-sided or one-sided
+test: "2" (default, two-sided), "U" (upper, one-sided alternative
+\eqn{\mu > h_0}), or "L" (lower, one-sided alternative \eqn{\mu < h_0}).
+The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
@@ -212,6 +233,13 @@ viewer.  By default, the report is printed to the viewer. The "noprint"
 option will inhibit printing.  You may inhibit printing globally by
 setting the package print option to false:
 \code{options("procs.print" = FALSE)}.
+}
+\item{\strong{sides = }: The "sides = " option indicates whether to perform
+a one-sided or two-sided T-test.  Valid values are "2" for two-sided,
+"U" for upper, and "L" for lower.  The default value is "2". The sides parameter
+will effect the data frame output, interactive report, and any requested plots.
+For one-sided tests, the confidence intervals will be set to negative or positive
+infinity for the alternative hypothesis.
 }
 }
 }
