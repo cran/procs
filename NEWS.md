@@ -1,3 +1,16 @@
+# procs 1.1.0
+
+* Added "outpct" option to `proc_freq()`.   
+* Added "varnames" option to `proc_freq()`.
+* Added "rename", "keep and "drop" parameters to `proc_freq()`.
+* Added "rename", "keep and "drop" parameters to `proc_means()`.
+* Added `proc_glm()` for general linear models with categorical predictors.
+* Added "contrast" and "estimate" parameters to `proc_glm()`, including
+multi-row contrasts for multiple degree of freedom F tests.
+* Added "order" parameter to `proc_glm()`.
+* Added "noint", "xpx", "inverse", "e1", "e2", "e3", "clm", and "cli" statistics
+keywords to `proc_glm()`.
+
 # procs 1.0.9
 
 * Added "sides" option to `proc_ttest()`.

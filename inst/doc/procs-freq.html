@@ -565,6 +565,79 @@ mechanism in SAS®. With <code>proc_freq()</code>, by default, all
 requested tables and statistics will be returned in a list. No other
 output parameters are needed.</p>
 </div>
+<div id="renaming-keeping-and-dropping-columns" class="section level2">
+<h2>Renaming, Keeping, and Dropping Columns</h2>
+<p>The <code>proc_freq()</code> function offers three parameters that
+let you reshape the columns on the output dataset(s) without any
+additional data manipulation: <code>rename</code>, <code>keep</code>,
+and <code>drop</code>. These parameters only affect the output
+dataset(s) returned from the function (the “out” datasets); they have no
+effect on the interactive report, the “report” datasets, the “nlevels”
+dataset, or any statistical output.</p>
+<ul>
+<li>The <code>rename</code> parameter accepts a named vector, where the
+name is the existing column name and the value is the desired new
+name.</li>
+<li>The <code>keep</code> parameter accepts a vector of column names to
+retain on the output dataset. Any column not named on the
+<code>keep</code> vector is removed.</li>
+<li>The <code>drop</code> parameter accepts a vector of column names to
+remove from the output dataset. All other columns are retained.</li>
+</ul>
+<p>If there is more than one table request, you may supply a single
+vector on <code>rename</code>, <code>keep</code>, or <code>drop</code>
+that will be applied to every table, or a list of vectors—one for each
+table. The list may be named or unnamed. If named, the names should
+match the table names (either the table specification itself, or the
+name assigned on a named table request); if unnamed, the vectors are
+matched to the table requests positionally.</p>
+<p>These three operations are always applied in the same order:
+<code>rename</code> is performed first, followed by <code>keep</code>,
+and finally <code>drop</code>. Because <code>rename</code> happens
+first, the <code>keep</code> and <code>drop</code> vectors should refer
+to the <em>new</em> column names, not the original ones.</p>
+<p>Here is an example that renames, then keeps, columns on a single
+table request:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Rename and keep columns on a single table</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y,</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>                 <span class="at">rename =</span> <span class="fu">c</span>(<span class="at">CAT =</span> <span class="st">&quot;Category&quot;</span>, <span class="at">CNT =</span> <span class="st">&quot;Frequency&quot;</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>                 <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Category&quot;</span>, <span class="st">&quot;Frequency&quot;</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># View results</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>res</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#   Category Frequency</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co"># 1        A         3</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co"># 2        B         2</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co"># 3        C         3</span></span></code></pre></div>
+<p>For multiple table requests, you can supply a list of vectors to
+target each table individually. Here, the “y” table is renamed and
+reduced to two columns, while the “x” table is only renamed:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Rename columns differently for each table</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> <span class="fu">v</span>(x, y),</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                 <span class="at">rename =</span> <span class="fu">list</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="at">CAT =</span> <span class="st">&quot;Category&quot;</span>, <span class="at">CNT =</span> <span class="st">&quot;Frequency&quot;</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>                               <span class="at">x =</span> <span class="fu">c</span>(<span class="at">CAT =</span> <span class="st">&quot;Category&quot;</span>)),</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                 <span class="at">keep =</span> <span class="fu">list</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="st">&quot;Category&quot;</span>, <span class="st">&quot;Frequency&quot;</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                             <span class="at">x =</span> <span class="fu">c</span>(<span class="st">&quot;VAR&quot;</span>, <span class="st">&quot;Category&quot;</span>, <span class="st">&quot;N&quot;</span>)))</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># View results</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>res</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co"># $x</span></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#   VAR Category N</span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co"># 1   x        2 8</span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co"># 2   x        3 8</span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co"># 3   x        5 8</span></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co"># 4   x        6 8</span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co"># $y</span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#   Category Frequency</span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co"># 1        A         3</span></span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co"># 2        B         2</span></span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co"># 3        C         3</span></span></code></pre></div>
+<p>Because <code>keep</code> and <code>drop</code> are applied after
+<code>rename</code>, note that the <code>keep</code> vector for the “y”
+table above refers to “Category” and “Frequency” (the renamed columns),
+not the original “CAT” and “CNT” column names.</p>
+</div>
 <div id="output-ordering" class="section level2">
 <h2>Output Ordering</h2>
 <p>The <code>order</code> parameter allows the user to control the sort
@@ -606,44 +679,44 @@ shaping data: “wide”, “long”, and “stacked”. These options control h
 the output data is organized. The options are also passed on the
 <code>output</code> parameter. The shaping options are best illustrated
 by an example:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Shape wide</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                  <span class="at">output =</span> wide)</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># Wide results</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>res1</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#   VAR CAT N CNT  PCT</span></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># 1   y   A 8   3 37.5</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co"># 2   y   B 8   2 25.0</span></span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co"># 3   y   C 8   3 37.5</span></span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co"># Shape long</span></span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>                  <span class="at">output =</span> long)</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co"># Long results</span></span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>res2</span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#   VAR STAT    A  B    C</span></span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co"># 1   y    N  8.0  8  8.0</span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co"># 2   y  CNT  3.0  2  3.0</span></span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co"># 3   y  PCT 37.5 25 37.5</span></span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a></span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co"># Shape stacked</span></span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a>                  <span class="at">output =</span> stacked)</span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a></span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="co"># Stacked results</span></span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>res3</span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="co">#   VAR CAT STAT VALUES</span></span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="co"># 1   y   A    N    8.0</span></span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a><span class="co"># 2   y   A  CNT    3.0</span></span>
-<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="co"># 3   y   A  PCT   37.5</span></span>
-<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a><span class="co"># 4   y   B    N    8.0</span></span>
-<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a><span class="co"># 5   y   B  CNT    2.0</span></span>
-<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a><span class="co"># 6   y   B  PCT   25.0</span></span>
-<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a><span class="co"># 7   y   C    N    8.0</span></span>
-<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a><span class="co"># 8   y   C  CNT    3.0</span></span>
-<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a><span class="co"># 9   y   C  PCT   37.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Shape wide</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>                  <span class="at">output =</span> wide)</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co"># Wide results</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>res1</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co">#   VAR CAT N CNT  PCT</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="co"># 1   y   A 8   3 37.5</span></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co"># 2   y   B 8   2 25.0</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co"># 3   y   C 8   3 37.5</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="co"># Shape long</span></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>                  <span class="at">output =</span> long)</span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co"># Long results</span></span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a>res2</span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a><span class="co">#   VAR STAT    A  B    C</span></span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co"># 1   y    N  8.0  8  8.0</span></span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="co"># 2   y  CNT  3.0  2  3.0</span></span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a><span class="co"># 3   y  PCT 37.5 25 37.5</span></span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co"># Shape stacked</span></span>
+<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> y, </span>
+<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a>                  <span class="at">output =</span> stacked)</span>
+<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a></span>
+<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a><span class="co"># Stacked results</span></span>
+<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a>res3</span>
+<span id="cb18-29"><a href="#cb18-29" tabindex="-1"></a><span class="co">#   VAR CAT STAT VALUES</span></span>
+<span id="cb18-30"><a href="#cb18-30" tabindex="-1"></a><span class="co"># 1   y   A    N    8.0</span></span>
+<span id="cb18-31"><a href="#cb18-31" tabindex="-1"></a><span class="co"># 2   y   A  CNT    3.0</span></span>
+<span id="cb18-32"><a href="#cb18-32" tabindex="-1"></a><span class="co"># 3   y   A  PCT   37.5</span></span>
+<span id="cb18-33"><a href="#cb18-33" tabindex="-1"></a><span class="co"># 4   y   B    N    8.0</span></span>
+<span id="cb18-34"><a href="#cb18-34" tabindex="-1"></a><span class="co"># 5   y   B  CNT    2.0</span></span>
+<span id="cb18-35"><a href="#cb18-35" tabindex="-1"></a><span class="co"># 6   y   B  PCT   25.0</span></span>
+<span id="cb18-36"><a href="#cb18-36" tabindex="-1"></a><span class="co"># 7   y   C    N    8.0</span></span>
+<span id="cb18-37"><a href="#cb18-37" tabindex="-1"></a><span class="co"># 8   y   C  CNT    3.0</span></span>
+<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a><span class="co"># 9   y   C  PCT   37.5</span></span></code></pre></div>
 <p>As seen above, the “wide” option places the statistics in columns
 across the top of the dataset and the categories in rows. This shaping
 option is the default. The “long” option places the statistics in rows,

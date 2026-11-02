@@ -13,7 +13,7 @@ adoption by providing SAS® programmers a familiar conceptual framework and
 functions that produce nearly identical output.
 }
 \details{
-Despite having similar analytical capabilities, SAS® and R are very different
+Despite having similar analytic capabilities, SAS® and R are very different
 languages.  The \strong{procs} package helps SAS® users become productive
 in R by offering functions that mimic SAS® procedures.  The functions
 have a similar syntax, and produce similar output. Most importantly,
@@ -30,6 +30,7 @@ The \strong{procs} package contains the following major functions:
 \item \code{\link{proc_means}}: Generates summary statistics.
 \item \code{\link{proc_ttest}}: Performs hypothesis testing.
 \item \code{\link{proc_reg}}: Performs regression testing.
+\item \code{\link{proc_glm}}: Performs a generalized linear regression.
 \item \code{\link{proc_transpose}}: A function to pivot datasets.
 \item \code{\link{proc_sort}}: Sorts and dedupes a dataset.
 \item \code{\link{proc_print}}: An easy dataset print function.
@@ -52,6 +53,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item David Bosak \email{dbosak01@gmail.com}
   \item Diyu Yang \email{yang0diyu@gmail.com}
   \item Athenkosi Nkonyeni \email{athenkosi.nkonyeni@outlook.com}
 }

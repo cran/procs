@@ -6,297 +6,297 @@ knitr::opts_chunk$set(
 
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
-#  library(sassy)
-#  
-#  # Prepare Log -------------------------------------------------------------
-#  
-#  
-#  options("logr.autolog" = TRUE,
-#          "logr.on" = TRUE,
-#          "logr.notes" = FALSE,
-#          "procs.print" = FALSE)
-#  
-#  # Get temp directory
-#  tmp <- tempdir()
-#  
-#  # Open log
-#  lf <- log_open(file.path(tmp, "example1.log"))
-#  
-#  
-#  
-#  # Prepare formats ---------------------------------------------------------
-#  
-#  sep("Prepare formats")
-#  
-#  put("Age categories")
-#  agecat <- value(condition(x >= 18 & x <= 29, "18 to 29"),
-#                  condition(x >=30 & x <= 39, "30 to 39"),
-#                  condition(x >=40 & x <=49, "40 to 49"),
-#                  condition(x >= 50, ">= 50"),
-#                  condition(TRUE, "Out of range"),
+# library(sassy)
+# 
+# # Prepare Log -------------------------------------------------------------
+# 
+# 
+# options("logr.autolog" = TRUE,
+#         "logr.on" = TRUE,
+#         "logr.notes" = FALSE,
+#         "procs.print" = FALSE)
+# 
+# # Get temp directory
+# tmp <- tempdir()
+# 
+# # Open log
+# lf <- log_open(file.path(tmp, "example1.log"))
+# 
+# 
+# 
+# # Prepare formats ---------------------------------------------------------
+# 
+# sep("Prepare formats")
+# 
+# put("Age categories")
+# agecat <- value(condition(x >= 18 & x <= 29, "18 to 29"),
+#                 condition(x >=30 & x <= 39, "30 to 39"),
+#                 condition(x >=40 & x <=49, "40 to 49"),
+#                 condition(x >= 50, ">= 50"),
+#                 condition(TRUE, "Out of range"),
+#                 as.factor = TRUE)
+# 
+# put("Sex decodes")
+# fmt_sex <- value(condition(is.na(x), "Missing"),
+#                  condition(x == "M", "Male"),
+#                  condition(x == "F", "Female"),
+#                  condition(TRUE, "Other"),
 #                  as.factor = TRUE)
-#  
-#  put("Sex decodes")
-#  fmt_sex <- value(condition(is.na(x), "Missing"),
-#                   condition(x == "M", "Male"),
-#                   condition(x == "F", "Female"),
+# 
+# put("Race decodes")
+# fmt_race <- value(condition(is.na(x), "Missing"),
+#                   condition(x == "WHITE", "White"),
+#                   condition(x == "BLACK", "Black or African American"),
 #                   condition(TRUE, "Other"),
 #                   as.factor = TRUE)
-#  
-#  put("Race decodes")
-#  fmt_race <- value(condition(is.na(x), "Missing"),
-#                    condition(x == "WHITE", "White"),
-#                    condition(x == "BLACK", "Black or African American"),
-#                    condition(TRUE, "Other"),
-#                    as.factor = TRUE)
-#  
-#  
-#  put("Compile format catalog")
-#  fc <- fcat(MEAN = "%.1f", STD = "(%.2f)",
-#             Q1 = "%.1f", Q3 = "%.1f",
-#             MIN = "%d", MAX = "%d",
-#             CNT = "%2d", PCT = "(%5.1f%%)",
-#             AGECAT = agecat,
-#             SEX = fmt_sex,
-#             RACE = fmt_race)
-#  
-#  
-#  # Load and Prepare Data ---------------------------------------------------
-#  
-#  sep("Prepare Data")
-#  
-#  
-#  put("Create sample ADSL data.")
-#  adsl <- read.table(header = TRUE, text = '
-#    SUBJID  ARM    SEX  RACE    AGE
-#    "001"   "ARM A" "F"  "WHITE" 19
-#    "002"   "ARM B" "F"  "WHITE" 21
-#    "003"   "ARM C" "F"  "WHITE" 23
-#    "004"   "ARM D" "F"  "BLACK" 28
-#    "005"   "ARM A" "M"  "WHITE" 37
-#    "006"   "ARM B" "M"  "WHITE" 34
-#    "007"   "ARM C" "M"  "WHITE" 36
-#    "008"   "ARM D" "M"  "WHITE" 30
-#    "009"   "ARM A" "F"  "WHITE" 39
-#    "010"   "ARM B" "F"  "WHITE" 31
-#    "011"   "ARM C" "F"  "BLACK" 33
-#    "012"   "ARM D" "F"  "WHITE" 38
-#    "013"   "ARM A" "M"  "BLACK" 37
-#    "014"   "ARM B" "M"  "WHITE" 34
-#    "015"   "ARM C" "M"  "WHITE" 36
-#    "016"   "ARM A" "M"  "WHITE" 40')
-#  
-#  put("Categorize AGE")
-#  adsl$AGECAT <- fapply(adsl$AGE, agecat)
-#  
-#  put("Log starting dataset")
-#  put(adsl)
-#  
-#  
-#  put("Get ARM population counts")
-#  proc_freq(adsl, tables = ARM,
-#            output = long,
-#            options = v(nopercent, nonobs)) -> arm_pop
-#  
-#  # Age Summary Block -------------------------------------------------------
-#  
-#  sep("Create summary statistics for age")
-#  
-#  put("Call means procedure to get summary statistics for age")
-#  proc_means(adsl, var = AGE,
-#             stats = v(n, mean, std, median, q1, q3, min, max),
-#             by = ARM,
-#             options = v(notype, nofreq)) -> age_stats
-#  
-#  put("Combine stats")
-#  datastep(age_stats,
-#           format = fc,
-#           drop = find.names(age_stats, start = 4),
-#           {
-#             `Mean (SD)` <- fapply2(MEAN, STD)
-#             Median <- MEDIAN
-#             `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
-#             `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
-#  
-#  
-#           }) -> age_comb
-#  
-#  put("Transpose ARMs into columns")
-#  proc_transpose(age_comb,
-#                 var = names(age_comb),
-#                 copy = VAR, id = BY,
-#                 name = LABEL) -> age_block
-#  
-#  
-#  # Sex Block ---------------------------------------------------------------
-#  
-#  sep("Create frequency counts for SEX")
-#  
-#  put("Get sex frequency counts")
-#  proc_freq(adsl, tables = SEX,
+# 
+# 
+# put("Compile format catalog")
+# fc <- fcat(MEAN = "%.1f", STD = "(%.2f)",
+#            Q1 = "%.1f", Q3 = "%.1f",
+#            MIN = "%d", MAX = "%d",
+#            CNT = "%2d", PCT = "(%5.1f%%)",
+#            AGECAT = agecat,
+#            SEX = fmt_sex,
+#            RACE = fmt_race)
+# 
+# 
+# # Load and Prepare Data ---------------------------------------------------
+# 
+# sep("Prepare Data")
+# 
+# 
+# put("Create sample ADSL data.")
+# adsl <- read.table(header = TRUE, text = '
+#   SUBJID  ARM    SEX  RACE    AGE
+#   "001"   "ARM A" "F"  "WHITE" 19
+#   "002"   "ARM B" "F"  "WHITE" 21
+#   "003"   "ARM C" "F"  "WHITE" 23
+#   "004"   "ARM D" "F"  "BLACK" 28
+#   "005"   "ARM A" "M"  "WHITE" 37
+#   "006"   "ARM B" "M"  "WHITE" 34
+#   "007"   "ARM C" "M"  "WHITE" 36
+#   "008"   "ARM D" "M"  "WHITE" 30
+#   "009"   "ARM A" "F"  "WHITE" 39
+#   "010"   "ARM B" "F"  "WHITE" 31
+#   "011"   "ARM C" "F"  "BLACK" 33
+#   "012"   "ARM D" "F"  "WHITE" 38
+#   "013"   "ARM A" "M"  "BLACK" 37
+#   "014"   "ARM B" "M"  "WHITE" 34
+#   "015"   "ARM C" "M"  "WHITE" 36
+#   "016"   "ARM A" "M"  "WHITE" 40')
+# 
+# put("Categorize AGE")
+# adsl$AGECAT <- fapply(adsl$AGE, agecat)
+# 
+# put("Log starting dataset")
+# put(adsl)
+# 
+# 
+# put("Get ARM population counts")
+# proc_freq(adsl, tables = ARM,
+#           output = long,
+#           options = v(nopercent, nonobs)) -> arm_pop
+# 
+# # Age Summary Block -------------------------------------------------------
+# 
+# sep("Create summary statistics for age")
+# 
+# put("Call means procedure to get summary statistics for age")
+# proc_means(adsl, var = AGE,
+#            stats = v(n, mean, std, median, q1, q3, min, max),
 #            by = ARM,
-#            options = nonobs) -> sex_freq
-#  
-#  
-#  put("Combine counts and percents.")
-#  datastep(sex_freq,
-#           format = fc,
-#           rename = list(CAT = "LABEL"),
-#           drop = v(CNT, PCT),
-#           {
-#  
-#             CNTPCT <- fapply2(CNT, PCT)
-#  
-#           }) -> sex_comb
-#  
-#  put("Transpose ARMs into columns")
-#  proc_transpose(sex_comb, id = BY,
-#                 var = CNTPCT,
-#                 copy = VAR, by = LABEL) -> sex_trans
-#  
-#  put("Clean up")
-#  datastep(sex_trans, drop = NAME,
-#           {
-#  
-#             LABEL <- fapply(LABEL, fc$SEX)
-#  
-#           }) -> sex_cnts
-#  
-#  put("Sort by label")
-#  proc_sort(sex_cnts, by = LABEL) -> sex_block
-#  
-#  
-#  
-#  # Race block --------------------------------------------------------------
-#  
-#  
-#  sep("Create frequency counts for RACE")
-#  
-#  put("Get race frequency counts")
-#  proc_freq(adsl, tables = RACE,
-#            by = ARM,
-#            options = nonobs) -> race_freq
-#  
-#  
-#  put("Combine counts and percents.")
-#  datastep(race_freq,
-#           format = fc,
-#           rename = list(CAT = "LABEL"),
-#           drop = v(CNT, PCT),
-#           {
-#  
-#             CNTPCT <- fapply2(CNT, PCT)
-#  
-#           }) -> race_comb
-#  
-#  put("Transpose ARMs into columns")
-#  proc_transpose(race_comb, id = BY, var = CNTPCT,
-#                 copy = VAR, by = LABEL) -> race_trans
-#  
-#  put("Clean up")
-#  
-#  datastep(race_trans, drop = NAME,
-#           where = expression(del == FALSE),
-#           {
-#             LABEL <- fapply(LABEL, fc$RACE)
-#             LABEL <- factor(LABEL, levels = levels(fc$RACE))
-#  
-#           }) -> race_cnts
-#  
-#  put("Sort by label")
-#  proc_sort(race_cnts, by = LABEL) -> race_block
-#  
-#  
-#  # Age Group Block ----------------------------------------------------------
-#  
-#  sep("Create frequency counts for Age Group")
-#  
-#  
-#  put("Get age group frequency counts")
-#  proc_freq(adsl,
-#            table = AGECAT,
-#            by = ARM,
-#            options = nonobs) -> ageg_freq
-#  
-#  put("Combine counts and percents and assign age group factor for sorting")
-#  datastep(ageg_freq,
-#           format = fc,
-#           keep = v(VAR, LABEL, BY, CNTPCT),
-#           {
-#             CNTPCT <- fapply2(CNT, PCT)
-#             LABEL <- factor(CAT, levels = levels(fc$AGECAT))
-#           }) -> ageg_comb
-#  
-#  
-#  put("Sort by age group factor")
-#  proc_sort(ageg_comb, by = v(BY, LABEL)) -> ageg_sort
-#  
-#  put("Tranpose age group block")
-#  proc_transpose(ageg_sort,
-#                 var = CNTPCT,
-#                 copy = VAR,
-#                 id = BY,
-#                 by = LABEL) -> ageg_trans
-#  
-#  put("Some clean up")
-#  datastep(ageg_trans,
-#           drop = NAME,
-#           {}) -> ageg_block
-#  
-#  
-#  put("Combine blocks into final data frame")
-#  datastep(age_block,
-#           set = list(ageg_block, sex_block, race_block),
-#           {}) -> final
-#  
-#  # Report ------------------------------------------------------------------
-#  
-#  sep("Create and print report")
-#  
-#  var_fmt <- c("AGE" = "Age", "AGECAT" = "Age Group", "SEX" = "Sex", "RACE" = "Race")
-#  
-#  # Create Table
-#  tbl <- create_table(final, header_bold = TRUE, borders = "top") |>
-#    column_defaults(from = `ARM A`, to = `ARM D`, align = "center", width = 1.1) |>
-#    stub(vars = c("VAR", "LABEL"), "Variable", width = 2.5) |>
-#    define(VAR, group_border = TRUE, dedupe = TRUE, label = "Variable",
-#           format = var_fmt,label_row = TRUE) |>
-#    define(LABEL, indent = .25, label = "Demographic Category") |>
-#    define(`ARM A`,  label = "Placebo", n = arm_pop["ARM A"]) |>
-#    define(`ARM B`,  label = "Drug 50mg", n = arm_pop["ARM B"]) |>
-#    define(`ARM C`,  label = "Drug 100mg", n = arm_pop["ARM C"]) |>
-#    define(`ARM D`,  label = "Competitor", n = arm_pop["ARM D"]) |>
-#    titles("Table 1.0", "Analysis of Demographic Characteristics",
-#           "Safety Population", bold = TRUE, font_size = 12,
-#           borders = "top") |>
-#    footnotes("Program: DM_Table.R",
-#              "NOTE: Denominator based on number of non-missing responses.",
-#              blank_row = "none", font_size = 10, italics = TRUE)
-#  
-#  rpt <- create_report(file.path(tmp, "ProcsDemoDM.rtf"),
-#                       output_type = "RTF",
-#                       font = "Arial", font_size = 11) |>
-#    page_header("Sponsor: Company", "Study: ABC") |>
-#    set_margins(top = 1, bottom = 1) |>
-#    add_content(tbl) |>
-#    page_footer("Date Produced: {Sys.Date()}", right = "Page [pg] of [tpg]")
-#  
-#  put("Write out the report")
-#  res <- write_report(rpt)
-#  
-#  # Clean Up ----------------------------------------------------------------
-#  sep("Clean Up")
-#  
-#  put("Close log")
-#  log_close()
-#  
-#  
-#  # Uncomment to view report
-#  # file.show(res$path)
-#  
-#  # Uncomment to view log
-#  # file.show(lf)
-#  
-#  
-#  
+#            options = v(notype, nofreq)) -> age_stats
+# 
+# put("Combine stats")
+# datastep(age_stats,
+#          format = fc,
+#          drop = find.names(age_stats, start = 4),
+#          {
+#            `Mean (SD)` <- fapply2(MEAN, STD)
+#            Median <- MEDIAN
+#            `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
+#            `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
+# 
+# 
+#          }) -> age_comb
+# 
+# put("Transpose ARMs into columns")
+# proc_transpose(age_comb,
+#                var = names(age_comb),
+#                copy = VAR, id = BY,
+#                name = LABEL) -> age_block
+# 
+# 
+# # Sex Block ---------------------------------------------------------------
+# 
+# sep("Create frequency counts for SEX")
+# 
+# put("Get sex frequency counts")
+# proc_freq(adsl, tables = SEX,
+#           by = ARM,
+#           options = nonobs) -> sex_freq
+# 
+# 
+# put("Combine counts and percents.")
+# datastep(sex_freq,
+#          format = fc,
+#          rename = list(CAT = "LABEL"),
+#          drop = v(CNT, PCT),
+#          {
+# 
+#            CNTPCT <- fapply2(CNT, PCT)
+# 
+#          }) -> sex_comb
+# 
+# put("Transpose ARMs into columns")
+# proc_transpose(sex_comb, id = BY,
+#                var = CNTPCT,
+#                copy = VAR, by = LABEL) -> sex_trans
+# 
+# put("Clean up")
+# datastep(sex_trans, drop = NAME,
+#          {
+# 
+#            LABEL <- fapply(LABEL, fc$SEX)
+# 
+#          }) -> sex_cnts
+# 
+# put("Sort by label")
+# proc_sort(sex_cnts, by = LABEL) -> sex_block
+# 
+# 
+# 
+# # Race block --------------------------------------------------------------
+# 
+# 
+# sep("Create frequency counts for RACE")
+# 
+# put("Get race frequency counts")
+# proc_freq(adsl, tables = RACE,
+#           by = ARM,
+#           options = nonobs) -> race_freq
+# 
+# 
+# put("Combine counts and percents.")
+# datastep(race_freq,
+#          format = fc,
+#          rename = list(CAT = "LABEL"),
+#          drop = v(CNT, PCT),
+#          {
+# 
+#            CNTPCT <- fapply2(CNT, PCT)
+# 
+#          }) -> race_comb
+# 
+# put("Transpose ARMs into columns")
+# proc_transpose(race_comb, id = BY, var = CNTPCT,
+#                copy = VAR, by = LABEL) -> race_trans
+# 
+# put("Clean up")
+# 
+# datastep(race_trans, drop = NAME,
+#          where = expression(del == FALSE),
+#          {
+#            LABEL <- fapply(LABEL, fc$RACE)
+#            LABEL <- factor(LABEL, levels = levels(fc$RACE))
+# 
+#          }) -> race_cnts
+# 
+# put("Sort by label")
+# proc_sort(race_cnts, by = LABEL) -> race_block
+# 
+# 
+# # Age Group Block ----------------------------------------------------------
+# 
+# sep("Create frequency counts for Age Group")
+# 
+# 
+# put("Get age group frequency counts")
+# proc_freq(adsl,
+#           table = AGECAT,
+#           by = ARM,
+#           options = nonobs) -> ageg_freq
+# 
+# put("Combine counts and percents and assign age group factor for sorting")
+# datastep(ageg_freq,
+#          format = fc,
+#          keep = v(VAR, LABEL, BY, CNTPCT),
+#          {
+#            CNTPCT <- fapply2(CNT, PCT)
+#            LABEL <- factor(CAT, levels = levels(fc$AGECAT))
+#          }) -> ageg_comb
+# 
+# 
+# put("Sort by age group factor")
+# proc_sort(ageg_comb, by = v(BY, LABEL)) -> ageg_sort
+# 
+# put("Tranpose age group block")
+# proc_transpose(ageg_sort,
+#                var = CNTPCT,
+#                copy = VAR,
+#                id = BY,
+#                by = LABEL) -> ageg_trans
+# 
+# put("Some clean up")
+# datastep(ageg_trans,
+#          drop = NAME,
+#          {}) -> ageg_block
+# 
+# 
+# put("Combine blocks into final data frame")
+# datastep(age_block,
+#          set = list(ageg_block, sex_block, race_block),
+#          {}) -> final
+# 
+# # Report ------------------------------------------------------------------
+# 
+# sep("Create and print report")
+# 
+# var_fmt <- c("AGE" = "Age", "AGECAT" = "Age Group", "SEX" = "Sex", "RACE" = "Race")
+# 
+# # Create Table
+# tbl <- create_table(final, header_bold = TRUE, borders = "top") |>
+#   column_defaults(from = `ARM A`, to = `ARM D`, align = "center", width = 1.1) |>
+#   stub(vars = c("VAR", "LABEL"), "Variable", width = 2.5) |>
+#   define(VAR, group_border = TRUE, dedupe = TRUE, label = "Variable",
+#          format = var_fmt,label_row = TRUE) |>
+#   define(LABEL, indent = .25, label = "Demographic Category") |>
+#   define(`ARM A`,  label = "Placebo", n = arm_pop["ARM A"]) |>
+#   define(`ARM B`,  label = "Drug 50mg", n = arm_pop["ARM B"]) |>
+#   define(`ARM C`,  label = "Drug 100mg", n = arm_pop["ARM C"]) |>
+#   define(`ARM D`,  label = "Competitor", n = arm_pop["ARM D"]) |>
+#   titles("Table 1.0", "Analysis of Demographic Characteristics",
+#          "Safety Population", bold = TRUE, font_size = 12,
+#          borders = "top") |>
+#   footnotes("Program: DM_Table.R",
+#             "NOTE: Denominator based on number of non-missing responses.",
+#             blank_row = "none", font_size = 10, italics = TRUE)
+# 
+# rpt <- create_report(file.path(tmp, "ProcsDemoDM.rtf"),
+#                      output_type = "RTF",
+#                      font = "Arial", font_size = 11) |>
+#   page_header("Sponsor: Company", "Study: ABC") |>
+#   set_margins(top = 1, bottom = 1) |>
+#   add_content(tbl) |>
+#   page_footer("Date Produced: {Sys.Date()}", right = "Page [pg] of [tpg]")
+# 
+# put("Write out the report")
+# res <- write_report(rpt)
+# 
+# # Clean Up ----------------------------------------------------------------
+# sep("Clean Up")
+# 
+# put("Close log")
+# log_close()
+# 
+# 
+# # Uncomment to view report
+# # file.show(res$path)
+# 
+# # Uncomment to view log
+# # file.show(lf)
+# 
+# 
+# 
 

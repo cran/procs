@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
 Title: Recreates Some 'SAS®' Procedures in 'R'
-Version: 1.0.9
+Version: 1.1.0
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
@@ -48,10 +48,10 @@ Suggests: knitr, rmarkdown, testthat (>= 3.0.0), covr, logr, ggplot2
 Imports: utils, fmtr, reporter, stats, tibble, sasLM (>= 0.9.9),
         graphics, withr
 VignetteBuilder: knitr
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-05-29 00:24:17 UTC; dbosa
+Packaged: 2026-11-02 14:50:43 UTC; dbosa
 Author: David Bosak [aut, cre],
   Diyu Yang [aut],
   Athenkosi Nkonyeni [aut],
@@ -60,4 +60,4 @@ Author: David Bosak [aut, cre],
   Duong Tran [ctb],
   Yifei Chen [ctb]
 Repository: CRAN
-Date/Publication: 2026-05-29 06:20:03 UTC
+Date/Publication: 2026-11-02 15:40:08 UTC
